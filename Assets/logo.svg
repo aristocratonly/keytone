@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14264D"/>
+      <stop offset="1" stop-color="#070E22"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#4C9BFF" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#3B7BFF" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#3B7BFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="skirt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A63D6"/>
+      <stop offset="1" stop-color="#173C8F"/>
+    </linearGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#8CC8FF"/>
+      <stop offset="0.55" stop-color="#5A9CFF"/>
+      <stop offset="1" stop-color="#3F7EF0"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+
+  <!-- squircle tile (macOS icon grid: 824 inside 1024) -->
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#bg)"/>
+  <rect x="101.5" y="101.5" width="821" height="821" rx="184.5" fill="none" stroke="url(#rim)" stroke-width="3"/>
+
+  <!-- ambient glow -->
+  <circle cx="512" cy="520" r="360" fill="url(#glow)"/>
+
+  <!-- contact shadow -->
+  <rect x="270" y="318" width="484" height="470" rx="104" fill="#020714" opacity="0.55"/>
+
+  <!-- keycap skirt -->
+  <rect x="262" y="290" width="500" height="476" rx="100" fill="url(#skirt)"/>
+  <!-- keycap top (dish) -->
+  <rect x="306" y="262" width="412" height="396" rx="80" fill="url(#top)"/>
+  <rect x="306" y="262" width="412" height="170" rx="80" fill="url(#sheen)"/>
+
+  <!-- legend: waveform -->
+  <g fill="#0B1A3D" opacity="0.88">
+    <rect x="379" y="425" width="34" height="70" rx="17"/>
+    <rect x="435" y="390" width="34" height="140" rx="17"/>
+    <rect x="491" y="355" width="34" height="210" rx="17"/>
+    <rect x="547" y="390" width="34" height="140" rx="17"/>
+    <rect x="603" y="425" width="34" height="70" rx="17"/>
+  </g>
+</svg>

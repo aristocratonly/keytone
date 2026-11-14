@@ -1,0 +1,6 @@
+.build/
+.swiftpm/
+Keytone.app/
+Keytone.zip
+Assets/AppIcon.iconset/
+.DS_Store
