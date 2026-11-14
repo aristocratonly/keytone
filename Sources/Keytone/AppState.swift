@@ -26,10 +26,19 @@ final class AppState {
 
     var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled {
         didSet {
+            guard !syncingLogin else { return }
             do { launchAtLogin ? try SMAppService.mainApp.register() : try SMAppService.mainApp.unregister() }
             catch { importMessage = "Автозапуск: \(error.localizedDescription)" }
+            // reflect the real state (a failed or pending registration must not leave the box ticked)
+            let actual = SMAppService.mainApp.status == .enabled
+            if actual != launchAtLogin { syncingLogin = true; launchAtLogin = actual; syncingLogin = false }
+            if SMAppService.mainApp.status == .requiresApproval {
+                importMessage = "Подтвердите автозапуск в Настройках → Основные → Объекты входа"
+                SMAppService.openSystemSettingsLoginItems()
+            }
         }
     }
+    @ObservationIgnored private var syncingLogin = false
 
     var hasPermission = InputMonitor.hasKeyboardAccess
     var importMessage: String?
@@ -51,6 +60,7 @@ final class AppState {
         scrollEnabled = d.bool(forKey: "scrollEnabled")
 
         customPacks = Library.loadCustom()
+        if !keyPacks.contains(where: { $0.id == keyProfile }) { keyProfile = keyPacks.first?.id ?? "" }
         monitor.handler = { [weak self] e in MainActor.assumeIsolated { self?.handle(e) } }
         monitor.start()
         if !InputMonitor.hasKeyboardAccess { InputMonitor.requestKeyboardAccess() }   // system prompt + adds Keytone to the list
@@ -88,8 +98,7 @@ final class AppState {
             if !down && !playRelease { return }
             guard let buf = currentKeyPack?.buffer(key: code, down: down) else { return }
             let pan = stereo ? Float(((Keymap.column[code] ?? 0.5) - 0.5) * 0.7) : 0
-            let packGain = (currentKeyPack as? MechvibesPack)?.gain ?? 1
-            engine.play(buf, volume: Float(keyVolume) * packGain * (down ? 1 : 0.7), pitch: pitch(), pan: pan)
+            engine.play(buf, volume: Float(keyVolume) * (down ? 1 : 0.7), pitch: pitch(), pan: pan)
         case let .mouse(button, down):
             guard enabled, mouseEnabled, let buf = currentMousePack?.buffer(button: button, down: down) else { return }
             engine.play(buf, volume: Float(mouseVolume) * (down ? 1 : 0.75), pitch: pitch())
@@ -144,6 +153,6 @@ final class AppState {
     func remove(_ pack: KeyPack) {
         if let f = pack.folder { try? FileManager.default.trashItem(at: f, resultingItemURL: nil) }
         customPacks = Library.loadCustom()
-        if keyProfile == pack.id { keyProfile = Library.builtInKeys.first?.id ?? "" }
+        if keyProfile == pack.id { keyProfile = keyPacks.first?.id ?? "" }
     }
 }

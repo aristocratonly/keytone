@@ -15,6 +15,11 @@ final class InputMonitor {
     private var modifiersDown = Set<UInt16>()
     private var lastScroll = Date.distantPast
 
+    private static let modifierMask: [UInt16: CGEventFlags] = [
+        56: .maskShift, 60: .maskShift, 59: .maskControl, 62: .maskControl,
+        58: .maskAlternate, 61: .maskAlternate, 55: .maskCommand, 54: .maskCommand, 63: .maskSecondaryFn,
+    ]
+
     static var hasKeyboardAccess: Bool { CGPreflightListenEventAccess() }
     static func requestKeyboardAccess() { _ = CGRequestListenEventAccess() }
 
@@ -64,12 +69,24 @@ final class InputMonitor {
             handler?(.key(code: code, down: type == .keyDown, isRepeat: rep))
         case .flagsChanged:
             let code = UInt16(e.getIntegerValueField(.keyboardEventKeycode))
-            if modifiersDown.remove(code) != nil {
-                handler?(.key(code: code, down: false, isRepeat: false))
-            } else {
-                modifiersDown.insert(code)
+            if code == 57 {   // Caps Lock: one event per physical press, flag shows lock state, not key state
                 handler?(.key(code: code, down: true, isRepeat: false))
+                break
             }
+            let isDown: Bool
+            if let mask = Self.modifierMask[code] {
+                isDown = e.flags.contains(mask)
+                // with both Shifts held, releasing one keeps the flag: fall back to our own tracking
+                if isDown && modifiersDown.contains(code) {
+                    modifiersDown.remove(code)
+                    handler?(.key(code: code, down: false, isRepeat: false))
+                    break
+                }
+            } else {
+                isDown = !modifiersDown.contains(code)
+            }
+            if isDown { modifiersDown.insert(code) } else { modifiersDown.remove(code) }
+            handler?(.key(code: code, down: isDown, isRepeat: false))
         case .leftMouseDown:
             handler?(.mouse(button: 0, down: true))
         case .leftMouseUp: handler?(.mouse(button: 0, down: false))

@@ -66,7 +66,7 @@ final class MechvibesPack: KeyPack {
               let cfg = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
         let name = (cfg["name"] as? String) ?? folder.lastPathComponent
         let author = (cfg["author"] as? String).map { "by " + $0 } ?? "Mechvibes"
-        super.init(id: "mv:" + folder.lastPathComponent, name: name, subtitle: author,
+        super.init(id: (custom ? "user:" : "mv:") + folder.lastPathComponent, name: name, subtitle: author,
                    symbol: custom ? "waveform" : "keyboard", tags: [], isCustom: custom)
         self.folder = folder
 
@@ -127,6 +127,16 @@ final class MechvibesPack: KeyPack {
         }.sorted()
         let median = peaks[peaks.count / 2]
         if median > 0.001 { gain *= min(3, 0.5 / median) }
+        // AVAudioPlayerNode.volume is capped at 1.0, so apply the gain to the samples themselves.
+        var seen = Set<ObjectIdentifier>()
+        for b in pool + upPool where seen.insert(ObjectIdentifier(b)).inserted {
+            let n = Int(b.frameLength)
+            for c in 0..<Int(b.format.channelCount) {
+                let d = b.floatChannelData![c]
+                for i in 0..<n { d[i] = max(-0.98, min(0.98, d[i] * gain)) }
+            }
+        }
+        gain = 1
     }
 
     var keyCount: Int { downs.count }
