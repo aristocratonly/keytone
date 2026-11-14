@@ -187,7 +187,9 @@ struct Row: View {
             .frame(width: 14)
             VStack(alignment: .leading, spacing: 1) {
                 Text(title).font(.system(size: 12.5, weight: selected ? .semibold : .regular)).foregroundStyle(Theme.text).lineLimit(1)
-                Text(subtitle).font(.system(size: 10.5)).foregroundStyle(Theme.dim).lineLimit(1)
+                if !subtitle.isEmpty {
+                    Text(subtitle).font(.system(size: 10.5)).foregroundStyle(Theme.dim).lineLimit(1)
+                }
             }
             Spacer(minLength: 4)
             if let onDelete, hover {
@@ -195,7 +197,7 @@ struct Row: View {
                     .buttonStyle(.plain).foregroundStyle(Theme.dim)
             }
         }
-        .padding(.horizontal, 10).padding(.vertical, 7)
+        .padding(.horizontal, 10).padding(.vertical, subtitle.isEmpty ? 9 : 7)
         .background(selected ? Theme.accent.opacity(0.1) : (hover ? Color.white.opacity(0.03) : .clear))
         .contentShape(Rectangle())
         .onTapGesture { withAnimation(Theme.anim) { action() } }

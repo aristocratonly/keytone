@@ -54,6 +54,14 @@ final class SynthKeyPack: KeyPack {
 
 /// Mechvibes-compatible pack: a folder with config.json + audio (single sprite file or one file per key).
 final class MechvibesPack: KeyPack {
+    /// Short, clean names for the bundled packs (folder name -> menu title).
+    static let displayNames: [String: String] = [
+        "Creamy Legendary": "Creamy Legendary",
+        "(the creamiest one) Zoom TKL morandi switches Lubed": "Zoom TKL Morandi",
+        "amazin keychron q3 bluex": "Keychron Q3 Blue",
+        "wooting 60he": "Wooting 60HE",
+        "WOB Rainy 75 PRO (FR4 + Kailh Cocoa)": "Rainy 75 Pro",
+    ]
     private var downs: [String: AVAudioPCMBuffer] = [:]   // key: scancode string (v1) or KeyboardEvent.code (v2)
     private var ups: [String: AVAudioPCMBuffer] = [:]
     private var pool: [AVAudioPCMBuffer] = []
@@ -64,9 +72,9 @@ final class MechvibesPack: KeyPack {
     init?(folder: URL, custom: Bool = true) {
         guard let data = try? Data(contentsOf: folder.appendingPathComponent("config.json")),
               let cfg = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
-        let name = (cfg["name"] as? String) ?? folder.lastPathComponent
-        let author = (cfg["author"] as? String).map { "by " + $0 } ?? "Mechvibes"
-        super.init(id: (custom ? "user:" : "mv:") + folder.lastPathComponent, name: name, subtitle: author,
+        let raw = (cfg["name"] as? String) ?? folder.lastPathComponent
+        let name = custom ? raw : (Self.displayNames[folder.lastPathComponent] ?? raw)
+        super.init(id: (custom ? "user:" : "mv:") + folder.lastPathComponent, name: name, subtitle: "",
                    symbol: custom ? "waveform" : "keyboard", tags: [], isCustom: custom)
         self.folder = folder
 
