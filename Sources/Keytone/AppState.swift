@@ -98,13 +98,13 @@ final class AppState {
             if !down && !playRelease { return }
             guard let buf = currentKeyPack?.buffer(key: code, down: down) else { return }
             let pan = stereo ? Float(((Keymap.column[code] ?? 0.5) - 0.5) * 0.7) : 0
-            engine.play(buf, volume: Float(keyVolume) * (down ? 1 : 0.7), pitch: pitch(), pan: pan)
+            engine.play(buf, volume: Float(keyVolume) * (down ? 1 : 0.7), pitch: pitch(), pan: pan, tag: Int(code) + (down ? 0 : 500))
         case let .mouse(button, down):
             guard enabled, mouseEnabled, let buf = currentMousePack?.buffer(button: button, down: down) else { return }
-            engine.play(buf, volume: Float(mouseVolume) * (down ? 1 : 0.75), pitch: pitch())
+            engine.play(buf, volume: Float(mouseVolume) * (down ? 1 : 0.75), pitch: pitch(), tag: 1000 + button)
         case .scroll:
             guard enabled, mouseEnabled, scrollEnabled, let buf = currentMousePack?.scroll() else { return }
-            engine.play(buf, volume: Float(mouseVolume) * 0.6, pitch: pitch())
+            engine.play(buf, volume: Float(mouseVolume) * 0.6, pitch: pitch(), tag: 1100)
         }
     }
 

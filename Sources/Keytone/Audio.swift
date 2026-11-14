@@ -3,20 +3,46 @@ import AVFoundation
 let kSampleRate: Double = 48_000
 let kFormat = AVAudioFormat(standardFormatWithSampleRate: kSampleRate, channels: 2)!
 
-/// Low-latency polyphonic player: a ring of player nodes so fast typing overlaps instead of cutting off.
+/// Low-latency polyphonic player tuned for fast typing:
+/// - per-key choke: a new press of the same key fades out its previous sound
+/// - ducking: older tails get quieter when a new sound starts, so attacks stay distinct
+/// - polyphony cap: only the newest `maxActive` sounds keep playing
+/// - peak limiter on the output so stacked sounds never clip
 final class SoundEngine {
+    private final class Voice {
+        let player = AVAudioPlayerNode()
+        let speed = AVAudioUnitVarispeed()
+        var tag: Int = -1          // what triggered it (key code, mouse id) for choking
+        var started: TimeInterval = 0
+        var ends: TimeInterval = 0
+        var baseVolume: Float = 0
+        var generation = 0         // bumps on every reuse so stale fade-outs don't touch a new sound
+        func isActive(_ now: TimeInterval) -> Bool { now < ends }
+    }
+
     private let engine = AVAudioEngine()
-    private var voices: [(AVAudioPlayerNode, AVAudioUnitVarispeed)] = []
+    private let limiter = AVAudioUnitEffect(audioComponentDescription: AudioComponentDescription(
+        componentType: kAudioUnitType_Effect, componentSubType: kAudioUnitSubType_PeakLimiter,
+        componentManufacturer: kAudioUnitManufacturer_Apple, componentFlags: 0, componentFlagsMask: 0))
+    private let bus = AVAudioMixerNode()
+    private var voices: [Voice] = []
     private var next = 0
 
+    private let maxActive = 8
+    private let duck: Float = 0.6          // each newer sound multiplies older tails by this
+    private let fade: TimeInterval = 0.012 // choke / steal fade-out
+
     init() {
+        engine.attach(bus); engine.attach(limiter)
         for _ in 0..<24 {
-            let p = AVAudioPlayerNode(), v = AVAudioUnitVarispeed()
-            engine.attach(p); engine.attach(v)
-            engine.connect(p, to: v, format: kFormat)
-            engine.connect(v, to: engine.mainMixerNode, format: kFormat)
-            voices.append((p, v))
+            let v = Voice()
+            engine.attach(v.player); engine.attach(v.speed)
+            engine.connect(v.player, to: v.speed, format: kFormat)
+            engine.connect(v.speed, to: bus, format: kFormat)
+            voices.append(v)
         }
+        engine.connect(bus, to: limiter, format: kFormat)
+        engine.connect(limiter, to: engine.mainMixerNode, format: kFormat)
         engine.prepare()
         do { try engine.start(); Diag.log("audio engine started, out=\(engine.outputNode.outputFormat(forBus: 0))") } catch { Diag.log("audio engine FAILED: \(error)") }
         NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { [weak self] _ in
@@ -24,16 +50,48 @@ final class SoundEngine {
         }
     }
 
-    func play(_ buf: AVAudioPCMBuffer, volume: Float, pitch: Float = 1, pan: Float = 0) {
+    /// Short volume ramp then stop, avoiding the click of an abrupt cut.
+    private func fadeOut(_ v: Voice) {
+        let gen = v.generation, start = v.player.volume, steps = 4
+        for i in 1...steps {
+            DispatchQueue.main.asyncAfter(deadline: .now() + fade * Double(i) / Double(steps)) {
+                guard v.generation == gen else { return }
+                if i == steps { v.player.stop(); v.ends = 0 } else { v.player.volume = start * Float(steps - i) / Float(steps) }
+            }
+        }
+    }
+
+    func play(_ buf: AVAudioPCMBuffer, volume: Float, pitch: Float = 1, pan: Float = 0, tag: Int = -1) {
         if !engine.isRunning { do { try engine.start() } catch { Diag.log("restart FAILED: \(error)") } }
-        let (p, v) = voices[next]
+        let now = ProcessInfo.processInfo.systemUptime
+
+        var active = voices.filter { $0.isActive(now) }.sorted { $0.started < $1.started }
+        // choke: same key retriggered
+        if tag >= 0 {
+            for v in active where v.tag == tag { fadeOut(v) }
+            active.removeAll { $0.tag == tag }
+        }
+        // polyphony cap: fade the oldest
+        while active.count >= maxActive { fadeOut(active.removeFirst()) }
+        // duck the tails that keep ringing
+        for v in active { v.player.volume *= duck }
+
+        // pick a free voice (round-robin, skipping ones still ringing)
+        var v = voices[next]
+        for _ in 0..<voices.count where v.isActive(now) { next = (next + 1) % voices.count; v = voices[next] }
         next = (next + 1) % voices.count
-        p.stop()
-        v.rate = pitch
-        p.volume = volume
-        p.pan = pan
-        p.scheduleBuffer(buf, at: nil, options: [], completionHandler: nil)
-        p.play()
+
+        v.generation += 1
+        v.player.stop()
+        v.speed.rate = pitch
+        v.baseVolume = volume
+        v.player.volume = volume
+        v.player.pan = pan
+        v.tag = tag
+        v.started = now
+        v.ends = now + Double(buf.frameLength) / kSampleRate / Double(max(pitch, 0.5))
+        v.player.scheduleBuffer(buf, at: nil, options: [], completionHandler: nil)
+        v.player.play()
     }
 }
 
