@@ -173,6 +173,11 @@
   .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
   .reveal.in { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .btn, .key, .feat { transition: none; } }
+
+  .lang { font: 600 12px "JetBrains Mono", monospace; letter-spacing: .06em; color: var(--text); background: rgba(255,255,255,.05);
+    border: 1px solid var(--line2); border-radius: 8px; height: 30px; padding: 0 10px; cursor: pointer; transition: background .15s; }
+  .lang:hover { background: rgba(255,255,255,.1); }
+  nav .links { align-items: center; }
 </style>
 </head>
 <body>
@@ -182,10 +187,11 @@
   <div class="wrap">
     <a class="brand" href="#"><img src="assets/icon-512.png" alt="">Keytone</a>
     <div class="links">
-      <a href="#features">Возможности</a>
-      <a href="#install">Установка</a>
-      <a href="#faq">Вопросы</a>
+      <a href="#features"><span data-i18n="nav.features">Возможности</span></a>
+      <a href="#install"><span data-i18n="nav.install">Установка</span></a>
+      <a href="#faq"><span data-i18n="nav.faq">Вопросы</span></a>
       <a class="gh js-repo" href="#">GitHub</a>
+      <button class="lang js-lang" type="button" aria-label="Switch language">EN</button>
     </div>
   </div>
 </nav>
@@ -193,20 +199,20 @@
 <main class="wrap">
   <header class="hero">
     <div>
-      <span class="eyebrow mono"><i></i>macOS · бесплатно · открытый код</span>
-      <h1>Каждое нажатие — <span class="tap">звучит.</span></h1>
-      <p class="lead">Keytone добавляет Маку приятный звук механической клавиатуры и мыши. Без окон и настроек на полдня: иконка в строке меню, и всё.</p>
+      <span class="eyebrow mono"><i></i><span data-i18n="hero.eyebrow">macOS · бесплатно · открытый код</span></span>
+      <h1><span data-i18n="hero.title">Каждое нажатие — <span class="tap">звучит.</span></span></h1>
+      <p class="lead"><span data-i18n="hero.lead">Keytone добавляет macOS приятный звук механической клавиатуры и мыши. Без окон и настроек на полдня: иконка в строке меню, и всё.</span></p>
       <div class="cta">
         <a class="btn btn-primary js-download" href="#">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
-          Скачать для macOS
+          <span data-i18n="cta.download">Скачать для macOS</span>
         </a>
         <a class="btn btn-ghost js-repo" href="#">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.4c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
-          Исходный код
+          <span data-i18n="cta.source">Исходный код</span>
         </a>
       </div>
-      <p class="req">macOS 14 Sonoma и новее · Apple Silicon и Intel · 3 МБ</p>
+      <p class="req"><span data-i18n="hero.req">macOS 14 Sonoma и новее · Apple Silicon и Intel · 3 МБ</span></p>
     </div>
 
     <div class="stage reveal">
@@ -217,90 +223,117 @@
           <div class="sw"></div>
         </div>
         <div class="panel-body">
-          <div class="label">Звук клавиатуры</div>
+          <div class="label"><span data-i18n="panel.label">Звук клавиатуры</span></div>
           <div class="card js-profiles">
-            <div class="opt on" data-p="cream"><span class="r"></span><div>Creamy Legendary<small>мягкий, глубокий</small></div></div>
-            <div class="opt" data-p="tactile"><span class="r"></span><div>Zoom TKL morandi<small>сливочный, тактильный</small></div></div>
-            <div class="opt" data-p="clicky"><span class="r"></span><div>Keychron Q3 Blue<small>звонкий, кликающий</small></div></div>
+            <div class="opt on" data-p="cream"><span class="r"></span><div>Creamy Legendary<small><span data-i18n="panel.p1">мягкий, глубокий</span></small></div></div>
+            <div class="opt" data-p="tactile"><span class="r"></span><div>Zoom TKL morandi<small><span data-i18n="panel.p2">сливочный, тактильный</span></small></div></div>
+            <div class="opt" data-p="clicky"><span class="r"></span><div>Keychron Q3 Blue<small><span data-i18n="panel.p3">звонкий, кликающий</span></small></div></div>
           </div>
         </div>
       </div>
-      <div class="board js-board" aria-label="Попробуйте: нажимайте клавиши"></div>
-      <p class="hint">Попробуйте прямо здесь: печатайте на клавиатуре или кликайте по клавишам <kbd>A–L</kbd></p>
+      <div class="board js-board" aria-label="Keyboard demo"></div>
+      <p class="hint"><span data-i18n="hero.hint">Попробуйте прямо здесь: печатайте на клавиатуре или кликайте по клавишам <kbd>A–L</kbd></span></p>
     </div>
   </header>
 
   <section id="features">
     <div class="sec-head reveal">
-      <span class="mono" style="color:var(--accent)">Возможности</span>
-      <h2>Маленькое приложение. Большая разница.</h2>
-      <p>Всё, что нужно, — и ничего лишнего. Keytone не мешает работать и почти не тратит ресурсы.</p>
+      <span class="mono" style="color:var(--accent)"><span data-i18n="nav.features">Возможности</span></span>
+      <h2><span data-i18n="feat.title">Маленькое приложение. Большая разница.</span></h2>
+      <p><span data-i18n="feat.lead">Всё, что нужно, — и ничего лишнего. Keytone не мешает работать и почти не тратит ресурсы.</span></p>
     </div>
     <div class="grid">
       <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M7 10h.01M11 10h.01M15 10h.01M8 14h8"/></svg></div>
-        <h3>Реальные записи свитчей</h3><p>Пять встроенных паков: от мягкого «thock» до звонкого клика. У каждой клавиши свой звук нажатия и отпускания.</p></div>
+        <h3><span data-i18n="f1.t">Реальные записи свитчей</span></h3><p><span data-i18n="f1.d">Пять встроенных паков: от мягкого «thock» до звонкого клика. У каждой клавиши свой звук нажатия и отпускания.</span></p></div>
       <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="5"/><path d="M12 7v3"/></svg></div>
-        <h3>Звук мыши</h3><p>Отдельные звуки для левой и правой кнопки и колеса. Колесо можно выключить отдельно.</p></div>
+        <h3><span data-i18n="f2.t">Звук мыши</span></h3><p><span data-i18n="f2.d">Отдельные звуки для левой и правой кнопки и колеса. Колесо можно выключить отдельно.</span></p></div>
       <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h2M8 8v8M12 5v14M16 8v8M20 12h-2"/></svg></div>
-        <h3>Живой звук</h3><p>Лёгкий разброс тона и стерео-панорама по положению клавиши — печать не звучит как робот.</p></div>
+        <h3><span data-i18n="f3.t">Живой звук</span></h3><p><span data-i18n="f3.d">Лёгкий разброс тона и стерео-панорама по положению клавиши — печать не звучит как робот.</span></p></div>
       <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></div>
-        <h3>Паки Mechvibes</h3><p>Импортируйте любой пак Mechvibes (v1 и v2) — папкой или .zip. Включая .ogg.</p></div>
+        <h3><span data-i18n="f4.t">Паки Mechvibes</span></h3><p><span data-i18n="f4.d">Импортируйте любой пак Mechvibes (v1 и v2) — папкой или .zip. Включая .ogg.</span></p></div>
       <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 3L5 13h6l-1 8 8-10h-6l1-8z"/></svg></div>
-        <h3>Без задержки</h3><p>Нативное приложение на Swift и AVAudioEngine. Быстрая печать не обрывает звуки, а накладывает их.</p></div>
+        <h3><span data-i18n="f5.t">Без задержки</span></h3><p><span data-i18n="f5.d">Нативное приложение на Swift и AVAudioEngine. Быстрая печать не обрывает звуки, а накладывает их.</span></p></div>
       <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
-        <h3>Приватно</h3><p>Keytone только слушает факт нажатия, чтобы проиграть звук. Ничего не записывает и никуда не отправляет.</p></div>
+        <h3><span data-i18n="f6.t">Приватно</span></h3><p><span data-i18n="f6.d">Keytone только слушает факт нажатия, чтобы проиграть звук. Ничего не записывает и никуда не отправляет.</span></p></div>
     </div>
   </section>
 
   <section id="install">
     <div class="sec-head reveal">
-      <span class="mono" style="color:var(--accent)">Установка</span>
-      <h2>Четыре шага — и готово</h2>
+      <span class="mono" style="color:var(--accent)"><span data-i18n="nav.install">Установка</span></span>
+      <h2><span data-i18n="inst.title">Четыре шага — и готово</span></h2>
     </div>
     <div class="steps">
-      <div class="step reveal"><h3>Скачайте</h3><p>Архив <code>Keytone.zip</code> со страницы релизов и распакуйте.</p></div>
-      <div class="step reveal"><h3>Перенесите</h3><p>Перетащите <code>Keytone.app</code> в папку «Программы».</p></div>
-      <div class="step reveal"><h3>Откройте</h3><p>Первый раз — правый клик → «Открыть» → «Открыть». Приложение не подписано Apple, поэтому macOS спросит.</p></div>
-      <div class="step reveal"><h3>Разрешите</h3><p>«Настройки → Конфиденциальность → Мониторинг ввода» → включите Keytone.</p></div>
+      <div class="step reveal"><h3><span data-i18n="s1.t">Скачайте</span></h3><p><span data-i18n="s1.d">Архив <code>Keytone.zip</code> со страницы релизов и распакуйте.</span></p></div>
+      <div class="step reveal"><h3><span data-i18n="s2.t">Перенесите</span></h3><p><span data-i18n="s2.d">Перетащите <code>Keytone.app</code> в папку «Программы».</span></p></div>
+      <div class="step reveal"><h3><span data-i18n="s3.t">Откройте</span></h3><p><span data-i18n="s3.d">Первый раз — правый клик → «Открыть» → «Открыть». Приложение не подписано Apple, поэтому macOS спросит.</span></p></div>
+      <div class="step reveal"><h3><span data-i18n="s4.t">Разрешите</span></h3><p><span data-i18n="s4.d">«Настройки → Конфиденциальность → Мониторинг ввода» → включите Keytone.</span></p></div>
     </div>
   </section>
 
   <section id="faq">
     <div class="sec-head reveal">
-      <span class="mono" style="color:var(--accent)">Вопросы</span>
-      <h2>Частые вопросы</h2>
+      <span class="mono" style="color:var(--accent)"><span data-i18n="nav.faq">Вопросы</span></span>
+      <h2><span data-i18n="faq.title">Частые вопросы</span></h2>
     </div>
     <div class="faq">
-      <details class="reveal"><summary>Зачем доступ «Мониторинг ввода»?</summary>
-        <p>Без него macOS не сообщает приложениям о нажатиях клавиш. Keytone узнаёт только «клавиша нажата», чтобы проиграть звук, — текст не сохраняется и никуда не уходит. Код открыт, это можно проверить.</p></details>
-      <details class="reveal"><summary>macOS пишет, что приложение от неустановленного разработчика</summary>
-        <p>Keytone распространяется бесплатно и не подписан сертификатом Apple. Откройте его через правый клик → «Открыть», или «Настройки → Конфиденциальность и безопасность → Всё равно открыть».</p></details>
-      <details class="reveal"><summary>Где окно приложения?</summary>
-        <p>Его нет — Keytone живёт в строке меню (иконка клавиатуры вверху экрана). Там все настройки.</p></details>
-      <details class="reveal"><summary>Как добавить свой звук?</summary>
-        <p>Скачайте пак Mechvibes и выберите в меню «Импорт пака». Подходят папки и .zip, форматы v1 и v2.</p></details>
-      <details class="reveal"><summary>Как удалить?</summary>
-        <p>Выйдите из Keytone в меню и перетащите приложение из «Программ» в Корзину.</p></details>
+      <details class="reveal"><summary><span data-i18n="q1">Зачем доступ «Мониторинг ввода»?</span></summary>
+        <p><span data-i18n="a1">Без него macOS не сообщает приложениям о нажатиях клавиш. Keytone узнаёт только «клавиша нажата», чтобы проиграть звук, — текст не сохраняется и никуда не уходит. Код открыт, это можно проверить.</span></p></details>
+      <details class="reveal"><summary><span data-i18n="q2">macOS пишет, что приложение от неустановленного разработчика</span></summary>
+        <p><span data-i18n="a2">Keytone распространяется бесплатно и не подписан сертификатом Apple. Откройте его через правый клик → «Открыть», или «Настройки → Конфиденциальность и безопасность → Всё равно открыть».</span></p></details>
+      <details class="reveal"><summary><span data-i18n="q3">Где окно приложения?</span></summary>
+        <p><span data-i18n="a3">Его нет — Keytone живёт в строке меню (иконка клавиатуры вверху экрана). Там все настройки.</span></p></details>
+      <details class="reveal"><summary><span data-i18n="q4">Как добавить свой звук?</span></summary>
+        <p><span data-i18n="a4">Скачайте пак Mechvibes и выберите в меню «Импорт пака». Подходят папки и .zip, форматы v1 и v2.</span></p></details>
+      <details class="reveal"><summary><span data-i18n="q5">Как удалить?</span></summary>
+        <p><span data-i18n="a5">Выйдите из Keytone в меню и перетащите приложение из «Программ» в Корзину.</span></p></details>
     </div>
   </section>
 
   <div class="final reveal">
     <img src="assets/icon-512.png" alt="Keytone">
-    <h2>Сделайте печать приятной</h2>
-    <p>Бесплатно. Открытый код. 3 мегабайта.</p>
+    <h2><span data-i18n="final.title">Сделайте печать приятной</span></h2>
+    <p><span data-i18n="final.lead">Бесплатно. Открытый код. 3 мегабайта.</span></p>
     <a class="btn btn-primary js-download" href="#">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
-      Скачать Keytone
+      <span data-i18n="final.cta">Скачать Keytone</span>
     </a>
   </div>
 
   <footer>
-    <span>© Keytone · Звуковые паки принадлежат их авторам</span>
+    <span><span data-i18n="footer">© Keytone · Звуковые паки принадлежат их авторам</span></span>
     <a class="js-repo" href="#">GitHub</a>
   </footer>
 </main>
 
 <script>
+
+/* ---- i18n: RU / EN ---- */
+var I18N = { ru: {"nav.features": "Возможности", "nav.install": "Установка", "nav.faq": "Вопросы", "hero.eyebrow": "macOS · бесплатно · открытый код", "hero.title": "Каждое нажатие — <span class=\"tap\">звучит.</span>", "hero.lead": "Keytone добавляет macOS приятный звук механической клавиатуры и мыши. Без окон и настроек на полдня: иконка в строке меню, и всё.", "cta.download": "Скачать для macOS", "cta.source": "Исходный код", "hero.req": "macOS 14 Sonoma и новее · Apple Silicon и Intel · 3 МБ", "panel.label": "Звук клавиатуры", "panel.p1": "мягкий, глубокий", "panel.p2": "сливочный, тактильный", "panel.p3": "звонкий, кликающий", "hero.hint": "Попробуйте прямо здесь: печатайте на клавиатуре или кликайте по клавишам <kbd>A–L</kbd>", "feat.title": "Маленькое приложение. Большая разница.", "feat.lead": "Всё, что нужно, — и ничего лишнего. Keytone не мешает работать и почти не тратит ресурсы.", "f1.t": "Реальные записи свитчей", "f1.d": "Пять встроенных паков: от мягкого «thock» до звонкого клика. У каждой клавиши свой звук нажатия и отпускания.", "f2.t": "Звук мыши", "f2.d": "Отдельные звуки для левой и правой кнопки и колеса. Колесо можно выключить отдельно.", "f3.t": "Живой звук", "f3.d": "Лёгкий разброс тона и стерео-панорама по положению клавиши — печать не звучит как робот.", "f4.t": "Паки Mechvibes", "f4.d": "Импортируйте любой пак Mechvibes (v1 и v2) — папкой или .zip. Включая .ogg.", "f5.t": "Без задержки", "f5.d": "Нативное приложение на Swift и AVAudioEngine. Быстрая печать не обрывает звуки, а накладывает их.", "f6.t": "Приватно", "f6.d": "Keytone только слушает факт нажатия, чтобы проиграть звук. Ничего не записывает и никуда не отправляет.", "inst.title": "Четыре шага — и готово", "s1.t": "Скачайте", "s1.d": "Архив <code>Keytone.zip</code> со страницы релизов и распакуйте.", "s2.t": "Перенесите", "s2.d": "Перетащите <code>Keytone.app</code> в папку «Программы».", "s3.t": "Откройте", "s3.d": "Первый раз — правый клик → «Открыть» → «Открыть». Приложение не подписано Apple, поэтому macOS спросит.", "s4.t": "Разрешите", "s4.d": "«Настройки → Конфиденциальность → Мониторинг ввода» → включите Keytone.", "faq.title": "Частые вопросы", "q1": "Зачем доступ «Мониторинг ввода»?", "a1": "Без него macOS не сообщает приложениям о нажатиях клавиш. Keytone узнаёт только «клавиша нажата», чтобы проиграть звук, — текст не сохраняется и никуда не уходит. Код открыт, это можно проверить.", "q2": "macOS пишет, что приложение от неустановленного разработчика", "a2": "Keytone распространяется бесплатно и не подписан сертификатом Apple. Откройте его через правый клик → «Открыть», или «Настройки → Конфиденциальность и безопасность → Всё равно открыть».", "q3": "Где окно приложения?", "a3": "Его нет — Keytone живёт в строке меню (иконка клавиатуры вверху экрана). Там все настройки.", "q4": "Как добавить свой звук?", "a4": "Скачайте пак Mechvibes и выберите в меню «Импорт пака». Подходят папки и .zip, форматы v1 и v2.", "q5": "Как удалить?", "a5": "Выйдите из Keytone в меню и перетащите приложение из «Программ» в Корзину.", "final.title": "Сделайте печать приятной", "final.lead": "Бесплатно. Открытый код. 3 мегабайта.", "final.cta": "Скачать Keytone", "footer": "© Keytone · Звуковые паки принадлежат их авторам"}, en: {"nav.features": "Features", "nav.install": "Install", "nav.faq": "FAQ", "hero.eyebrow": "macOS · free · open source", "hero.title": "Every keystroke <span class=\"tap\">sounds good.</span>", "hero.lead": "Keytone gives macOS the satisfying sound of a mechanical keyboard and mouse. No windows, no endless settings — just an icon in the menu bar.", "cta.download": "Download for macOS", "cta.source": "Source code", "hero.req": "macOS 14 Sonoma or later · Apple Silicon &amp; Intel · 3 MB", "panel.label": "Keyboard sound", "panel.p1": "soft, deep", "panel.p2": "creamy, tactile", "panel.p3": "crisp, clicky", "hero.hint": "Try it right here: type on your keyboard or click the keys <kbd>A–L</kbd>", "feat.title": "Tiny app. Big difference.", "feat.lead": "Everything you need, nothing you don’t. Keytone stays out of your way and barely uses any resources.", "f1.t": "Real switch recordings", "f1.d": "Five built-in packs, from a soft “thock” to a crisp click. Every key has its own press and release sound.", "f2.t": "Mouse sounds", "f2.d": "Separate sounds for left and right buttons and the scroll wheel. The wheel can be muted on its own.", "f3.t": "Natural feel", "f3.d": "Subtle pitch variation and stereo panning by key position, so typing never sounds robotic.", "f4.t": "Mechvibes packs", "f4.d": "Import any Mechvibes pack (v1 and v2) as a folder or .zip, .ogg included.", "f5.t": "Zero lag", "f5.d": "Native Swift app on AVAudioEngine. Fast typing layers sounds instead of cutting them off.", "f6.t": "Private", "f6.d": "Keytone only notices that a key was pressed to play a sound. It records nothing and sends nothing.", "inst.title": "Four steps and you’re done", "s1.t": "Download", "s1.d": "Get <code>Keytone.zip</code> from the releases page and unzip it.", "s2.t": "Move", "s2.d": "Drag <code>Keytone.app</code> into your Applications folder.", "s3.t": "Open", "s3.d": "First time: right-click → Open → Open. The app isn’t signed by Apple, so macOS will ask.", "s4.t": "Allow", "s4.d": "System Settings → Privacy &amp; Security → Input Monitoring → turn on Keytone.", "faq.title": "Frequently asked questions", "q1": "Why does it need Input Monitoring?", "a1": "Without it, macOS doesn’t tell apps about key presses. Keytone only learns “a key was pressed” to play a sound — no text is stored or sent anywhere. The code is open, so you can check.", "q2": "macOS says the app is from an unidentified developer", "a2": "Keytone is free and isn’t signed with an Apple certificate. Open it with right-click → Open, or via System Settings → Privacy &amp; Security → Open Anyway.", "q3": "Where is the app window?", "a3": "There isn’t one — Keytone lives in the menu bar (the keyboard icon at the top of the screen). All settings are there.", "q4": "How do I add my own sound?", "a4": "Download a Mechvibes pack and choose “Import pack” in the menu. Folders and .zip files, v1 and v2, are supported.", "q5": "How do I uninstall it?", "a5": "Quit Keytone from its menu and drag the app from Applications to the Trash.", "final.title": "Make typing feel good", "final.lead": "Free. Open source. 3 megabytes.", "final.cta": "Download Keytone", "footer": "© Keytone · Sound packs belong to their authors"} };
+var META = {
+  ru: { title: "Keytone — звук клавиатуры для macOS", desc: "Keytone — бесплатное приложение для macOS: приятный звук механической клавиатуры и мыши при каждом нажатии. Живёт в строке меню." },
+  en: { title: "Keytone — keyboard sounds for macOS", desc: "Keytone is a free macOS app that plays satisfying mechanical keyboard and mouse sounds on every press. Lives in the menu bar." }
+};
+function setLang(lang) {
+  var dict = I18N[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    var v = dict[el.getAttribute('data-i18n')]; if (v != null) el.innerHTML = v;
+  });
+  document.title = META[lang].title;
+  var md = document.querySelector('meta[name="description"]'); if (md) md.content = META[lang].desc;
+  var b = document.querySelector('.js-lang'); if (b) b.textContent = lang === 'ru' ? 'EN' : 'RU';
+  try { localStorage.setItem('keytone-lang', lang); } catch (e) {}
+}
+(function () {
+  var saved = null; try { saved = localStorage.getItem('keytone-lang'); } catch (e) {}
+  var q = new URLSearchParams(location.search).get('lang');
+  var lang = q || saved || ((navigator.language || 'en').toLowerCase().indexOf('ru') === 0 ? 'ru' : 'en');
+  setLang(lang === 'ru' ? 'ru' : 'en');
+  document.querySelector('.js-lang').addEventListener('click', function () {
+    setLang(document.documentElement.lang === 'ru' ? 'en' : 'ru');
+  });
+})();
 /* ---- links: derive repo from the GitHub Pages address (user.github.io/repo) ---- */
 (function () {
   var host = location.hostname, path = location.pathname.split('/').filter(Boolean);
