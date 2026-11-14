@@ -11,7 +11,6 @@ let kFormat = AVAudioFormat(standardFormatWithSampleRate: kSampleRate, channels:
 final class SoundEngine {
     private final class Voice {
         let player = AVAudioPlayerNode()
-        let speed = AVAudioUnitVarispeed()
         var tag: Int = -1          // what triggered it (key code, mouse id) for choking
         var started: TimeInterval = 0
         var ends: TimeInterval = 0
@@ -36,9 +35,8 @@ final class SoundEngine {
         engine.attach(bus); engine.attach(limiter)
         for _ in 0..<24 {
             let v = Voice()
-            engine.attach(v.player); engine.attach(v.speed)
-            engine.connect(v.player, to: v.speed, format: kFormat)
-            engine.connect(v.speed, to: bus, format: kFormat)
+            engine.attach(v.player)
+            engine.connect(v.player, to: bus, format: kFormat)
             voices.append(v)
         }
         engine.connect(bus, to: limiter, format: kFormat)
@@ -81,17 +79,42 @@ final class SoundEngine {
         for _ in 0..<voices.count where v.isActive(now) { next = (next + 1) % voices.count; v = voices[next] }
         next = (next + 1) % voices.count
 
+        let buf = Self.resample(buf, rate: pitch)
         v.generation += 1
         v.player.stop()
-        v.speed.rate = pitch
         v.baseVolume = volume
         v.player.volume = volume
         v.player.pan = pan
         v.tag = tag
         v.started = now
-        v.ends = now + Double(buf.frameLength) / kSampleRate / Double(max(pitch, 0.5))
+        v.ends = now + Double(buf.frameLength) / kSampleRate
         v.player.scheduleBuffer(buf, at: nil, options: [], completionHandler: nil)
         v.player.play()
+    }
+}
+
+extension SoundEngine {
+    /// Pitch/speed change done once per sound (linear interpolation over a few thousand frames),
+    /// instead of a Varispeed unit per voice that resamples silence non-stop and burns CPU while idle.
+    static func resample(_ src: AVAudioPCMBuffer, rate: Float) -> AVAudioPCMBuffer {
+        if abs(rate - 1) < 0.002 { return src }
+        let n = Int(src.frameLength)
+        let m = max(1, Int(Double(n) / Double(rate)))
+        guard let out = AVAudioPCMBuffer(pcmFormat: src.format, frameCapacity: AVAudioFrameCount(m)),
+              let s = src.floatChannelData, let d = out.floatChannelData else { return src }
+        out.frameLength = AVAudioFrameCount(m)
+        let step = Double(rate)
+        for c in 0..<Int(src.format.channelCount) {
+            let si = s[c], di = d[c]
+            var pos = 0.0
+            for i in 0..<m {
+                let j = Int(pos), f = Float(pos - Double(j))
+                let a = si[min(j, n - 1)], b = si[min(j + 1, n - 1)]
+                di[i] = a + (b - a) * f
+                pos += step
+            }
+        }
+        return out
     }
 }
 

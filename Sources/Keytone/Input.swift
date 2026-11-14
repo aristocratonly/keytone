@@ -98,7 +98,11 @@ final class InputMonitor {
         case .otherMouseUp: handler?(.mouse(button: 2, down: false))
         case .scrollWheel:
             let now = Date()
+            // vertical only: Axis1 is up/down, Axis2 is left/right (horizontal swipes, Shift+wheel, tilt wheels)
+            let dy = abs(e.getDoubleValueField(.scrollWheelEventPointDeltaAxis1))
+            let dx = abs(e.getDoubleValueField(.scrollWheelEventPointDeltaAxis2))
             if e.getIntegerValueField(.scrollWheelEventIsContinuous) == 0 {
+                guard e.getIntegerValueField(.scrollWheelEventDeltaAxis1) != 0 else { break }
                 // notched mouse wheel: one event per detent -> one click
                 if now.timeIntervalSince(lastScroll) > 0.025 { lastScroll = now; handler?(.scroll) }
                 break
@@ -106,9 +110,8 @@ final class InputMonitor {
             // trackpad / smooth / momentum scrolling: click per distance travelled, like virtual detents,
             // so the clicks slow down with the content and stop when it stops
             if e.getIntegerValueField(.scrollWheelEventScrollPhase) == 1 { scrollAccum = 0 }   // gesture began
-            let dy = abs(e.getDoubleValueField(.scrollWheelEventPointDeltaAxis1))
-            let dx = abs(e.getDoubleValueField(.scrollWheelEventPointDeltaAxis2))
-            scrollAccum += max(dx, dy)
+            guard dy > dx else { break }   // mostly-horizontal gesture: ignore
+            scrollAccum += dy
             if scrollAccum >= Self.detent {
                 scrollAccum = min(scrollAccum - Self.detent, Self.detent)   // a fast flick doesn't bank a backlog of clicks
                 if now.timeIntervalSince(lastScroll) > 0.03 { lastScroll = now; handler?(.scroll) }
