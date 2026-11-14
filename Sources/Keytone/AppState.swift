@@ -89,6 +89,8 @@ final class AppState {
     }
 
     private func pitch() -> Float { Float(1 + Double.random(in: -1...1) * 0.06 * pitchVariance) }
+    /// Key sounds play slightly faster than recorded: shorter, snappier, a hair brighter.
+    private let keySpeed: Float = 1.05
 
     func handle(_ e: InputEvent) {
         switch e {
@@ -98,7 +100,7 @@ final class AppState {
             if !down && !playRelease { return }
             guard let buf = currentKeyPack?.buffer(key: code, down: down) else { return }
             let pan = stereo ? Float(((Keymap.column[code] ?? 0.5) - 0.5) * 0.7) : 0
-            engine.play(buf, volume: Float(keyVolume) * (down ? 1 : 0.7), pitch: pitch(), pan: pan, tag: Int(code) + (down ? 0 : 500))
+            engine.play(buf, volume: Float(keyVolume) * (down ? 1 : 0.7), pitch: pitch() * keySpeed, pan: pan, tag: Int(code) + (down ? 0 : 500))
         case let .mouse(button, down):
             guard enabled, mouseEnabled, let buf = currentMousePack?.buffer(button: button, down: down) else { return }
             engine.play(buf, volume: Float(mouseVolume) * (down ? 1 : 0.75), pitch: pitch(), tag: 1000 + button)
@@ -114,9 +116,9 @@ final class AppState {
         for (i, k) in seq.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.12) { [weak self] in
                 guard let self, let b = pack.buffer(key: k, down: true) else { return }
-                self.engine.play(b, volume: Float(self.keyVolume), pitch: self.pitch())
+                self.engine.play(b, volume: Float(self.keyVolume), pitch: self.pitch() * self.keySpeed)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.07) {
-                    if self.playRelease, let u = pack.buffer(key: k, down: false) { self.engine.play(u, volume: Float(self.keyVolume) * 0.7, pitch: self.pitch()) }
+                    if self.playRelease, let u = pack.buffer(key: k, down: false) { self.engine.play(u, volume: Float(self.keyVolume) * 0.7, pitch: self.pitch() * self.keySpeed) }
                 }
             }
         }

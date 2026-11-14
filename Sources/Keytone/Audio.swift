@@ -150,7 +150,15 @@ enum AudioIO {
     }
 
     static func slice(_ b: AVAudioPCMBuffer, startMs: Double, durMs: Double) -> AVAudioPCMBuffer? {
-        let start = Int(startMs / 1000 * kSampleRate)
+        var start = Int(startMs / 1000 * kSampleRate)
+        let end = start + Int(durMs / 1000 * kSampleRate)
+        // skip leading near-silence so the sound starts right on the keypress (keep 1 ms of lead-in)
+        if let s = b.floatChannelData, start >= 0, end <= Int(b.frameLength) {
+            var i = start
+            while i < end, abs(s[0][i]) < 0.01, abs(s[1][i]) < 0.01 { i += 1 }
+            if i < end { start = max(start, i - 48) }
+        }
+        let durMs = Double(end - start) / kSampleRate * 1000
         let len = min(Int(durMs / 1000 * kSampleRate), Int(b.frameLength) - start)
         guard start >= 0, len > 0, let out = AVAudioPCMBuffer(pcmFormat: kFormat, frameCapacity: AVAudioFrameCount(len)),
               let s = b.floatChannelData, let d = out.floatChannelData else { return nil }

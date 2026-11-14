@@ -14,6 +14,8 @@ final class InputMonitor {
     private var source: CFRunLoopSource?
     private var modifiersDown = Set<UInt16>()
     private var lastScroll = Date.distantPast
+    private var scrollAccum: Double = 0
+    private static let detent: Double = 36   // points of travel per click
 
     private static let modifierMask: [UInt16: CGEventFlags] = [
         56: .maskShift, 60: .maskShift, 59: .maskControl, 62: .maskControl,
@@ -96,7 +98,21 @@ final class InputMonitor {
         case .otherMouseUp: handler?(.mouse(button: 2, down: false))
         case .scrollWheel:
             let now = Date()
-            if now.timeIntervalSince(lastScroll) > 0.045 { lastScroll = now; handler?(.scroll) }
+            if e.getIntegerValueField(.scrollWheelEventIsContinuous) == 0 {
+                // notched mouse wheel: one event per detent -> one click
+                if now.timeIntervalSince(lastScroll) > 0.025 { lastScroll = now; handler?(.scroll) }
+                break
+            }
+            // trackpad / smooth / momentum scrolling: click per distance travelled, like virtual detents,
+            // so the clicks slow down with the content and stop when it stops
+            if e.getIntegerValueField(.scrollWheelEventScrollPhase) == 1 { scrollAccum = 0 }   // gesture began
+            let dy = abs(e.getDoubleValueField(.scrollWheelEventPointDeltaAxis1))
+            let dx = abs(e.getDoubleValueField(.scrollWheelEventPointDeltaAxis2))
+            scrollAccum += max(dx, dy)
+            if scrollAccum >= Self.detent {
+                scrollAccum = min(scrollAccum - Self.detent, Self.detent)   // a fast flick doesn't bank a backlog of clicks
+                if now.timeIntervalSince(lastScroll) > 0.03 { lastScroll = now; handler?(.scroll) }
+            }
         default: break
         }
     }
