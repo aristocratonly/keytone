@@ -4,3 +4,9 @@ Keytone.app/
 Keytone.zip
 Assets/AppIcon.iconset/
 .DS_Store
+
+# Impeccable design context (kept local)
+DESIGN.md
+PRODUCT.md
+AGENTS.md
+.impeccable/
