@@ -515,15 +515,24 @@ function resetPaper() { typedText = ''; renderPaper(); }
 
 var down = {};
 addEventListener('keydown', function (e) {
-  if (e.metaKey || e.ctrlKey || e.altKey) return;
-  var printable = e.key.length === 1;
-  if (!printable && e.key !== 'Backspace' && e.key !== 'Enter') return;
+  if (e.ctrlKey) return;
+  var del = e.key === 'Backspace';
+  if (e.metaKey && !del) return;          // leave Cmd shortcuts to the browser, except Cmd+Backspace
+  var printable = e.key.length === 1 && !e.metaKey;
+  if (!printable && !del && e.key !== 'Enter') return;
+  if (e.altKey && !del && !printable) return;
   var act = document.activeElement;
-  if ((e.key === ' ' || e.key === 'Enter') && act && /^(BUTTON|A|SUMMARY)$/.test(act.tagName)) return;
-  if (e.key === ' ' || e.key === 'Backspace') e.preventDefault();
+  // Space/Enter on a link, question or the language switch keeps its normal meaning;
+  // the sound tabs are part of the demo, so typing continues there
+  var demoTab = act && act.closest && act.closest('.tabs');
+  if ((e.key === ' ' || e.key === 'Enter') && act && !demoTab && /^(BUTTON|A|SUMMARY)$/.test(act.tagName)) return;
+  e.preventDefault();
+  if (demoTab) paper.focus();
   if (!down[e.code]) thock(false, e.key === ' ');
   down[e.code] = true;
-  if (e.key === 'Backspace') typedText = typedText.slice(0, -1);
+  if (del && e.metaKey) typedText = '';                                   // Cmd+Backspace: whole line
+  else if (del && e.altKey) typedText = typedText.replace(/\S*\s*$/, '');  // Option+Backspace: previous word
+  else if (del) typedText = typedText.slice(0, -1);
   else if (e.key === 'Enter') typedText = '';
   else typedText = (typedText + e.key).slice(-90);
   renderPaper();
@@ -538,6 +547,7 @@ document.querySelectorAll('.tabs button').forEach(function (b) {
   b.addEventListener('click', function () {
     pack = b.dataset.pack;
     document.querySelectorAll('.tabs button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+    paper.focus({ preventScroll: true });
     thock(false, false); setTimeout(function () { thock(true, false); }, 90);
   });
 });
