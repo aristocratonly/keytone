@@ -4,426 +4,552 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Keytone — звук клавиатуры для macOS</title>
-<meta name="description" content="Keytone — бесплатное приложение для macOS: приятный звук механической клавиатуры и мыши при каждом нажатии. Живёт в строке меню.">
+<meta name="description" content="Keytone — бесплатная программа для macOS: живой звук механической клавиатуры и мыши при каждом нажатии. Сидит в строке меню.">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:title" content="Keytone — звук клавиатуры для macOS">
-<meta property="og:description" content="Приятный звук механической клавиатуры и мыши при каждом нажатии.">
+<meta property="og:description" content="Живой звук механической клавиатуры при каждом нажатии.">
 <meta property="og:image" content="https://aristocratonly.github.io/keytone/assets/icon-512.png">
 <meta property="og:url" content="https://aristocratonly.github.io/keytone/">
 <meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#9ccbe8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=PT+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #060b18;
-    --bg2: #0a1328;
-    --surface: #0f1a33;
-    --raised: #142246;
-    --line: rgba(255,255,255,.07);
-    --line2: rgba(255,255,255,.12);
-    --text: #eef2fb;
-    --dim: #93a0bb;
-    --faint: #5d6b88;
-    --accent: #5b9bff;
-    --accent2: #8cc8ff;
-    --deep: #2a63d6;
-    --ok: #52dc9e;
-    --radius: 18px;
+    --ground: #9ccbe8;
+    --ground-deep: #84b9db;
+    --card: #f6f9fb;
+    --gold: #f3c85c;
+    --mint: #bfe0b6;
+    --rose: #f2b8bd;
+    --ink: #1e1c1a;
+    --ink-soft: #3d3a36;
+    --red: #c4342b;
+    --red-deep: #9e2620;
+    --rule: rgba(64, 120, 170, .22);
+    --type: "PT Mono", "Courier New", monospace;
+    --sans: "Golos Text", system-ui, sans-serif;
+    --lift: 0 1px 1px rgba(30, 40, 60, .12), 0 6px 14px -4px rgba(30, 40, 60, .22), 0 22px 40px -18px rgba(30, 40, 60, .3);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; scrollbar-color: var(--ink-soft) var(--ground-deep); }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font: 16px/1.6 "Manrope", system-ui, sans-serif;
+    background: var(--ground);
+    color: var(--ink);
+    font: 17px/1.6 var(--sans);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    background-image: repeating-linear-gradient(0deg, transparent 0 31px, rgba(255,255,255,.18) 31px 32px);
   }
-  a { color: inherit; text-decoration: none; }
-  .wrap { width: min(1120px, 100% - 32px); margin: 0 auto; }
-  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  ::selection { background: var(--red); color: #fff; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px dashed var(--red); outline-offset: 3px; border-radius: 2px; }
 
-  /* backdrop: faint grid + one big cold light */
-  .backdrop { position: fixed; inset: 0; z-index: -1; pointer-events: none;
-    background:
-      radial-gradient(900px 600px at 70% -10%, rgba(64,124,255,.20), transparent 60%),
-      radial-gradient(700px 500px at 0% 30%, rgba(40,90,220,.10), transparent 60%),
-      linear-gradient(var(--bg), var(--bg2) 60%, var(--bg)); }
-  .backdrop::after { content: ""; position: absolute; inset: 0;
-    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, #000 30%, transparent 75%); opacity: .55; }
+  .wrap { width: min(1080px, 100% - 32px); margin: 0 auto; }
 
-  /* nav */
-  nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(14px); background: rgba(6,11,24,.6); border-bottom: 1px solid var(--line); }
-  nav .wrap { display: flex; align-items: center; gap: 28px; height: 64px; }
-  .brand { display: flex; align-items: center; gap: 10px; font: 700 17px "Unbounded", sans-serif; letter-spacing: -.01em; }
-  .brand img { width: 30px; height: 30px; }
-  nav .links { display: flex; gap: 24px; margin-left: auto; color: var(--dim); font-size: 14px; font-weight: 500; }
-  nav .links a:hover { color: var(--text); }
-  @media (max-width: 640px) { nav .links a:not(.gh) { display: none; } }
+  .typed { font-family: var(--type); font-weight: 400; letter-spacing: -.01em; }
+  .typed .ch { display: inline-block; white-space: pre; }
 
-  /* buttons */
-  .btn { display: inline-flex; align-items: center; gap: 10px; height: 50px; padding: 0 22px; border-radius: 13px;
-    font-weight: 700; font-size: 15px; transition: transform .15s ease, box-shadow .2s ease, background .2s; }
-  .btn svg { width: 18px; height: 18px; }
-  .btn-primary { background: linear-gradient(180deg, #78b0ff, #4a86f5); color: #061232;
-    box-shadow: 0 1px 0 rgba(255,255,255,.5) inset, 0 10px 30px -8px rgba(74,134,245,.7); }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,255,255,.5) inset, 0 16px 38px -8px rgba(74,134,245,.85); }
-  .btn-primary:active { transform: translateY(1px); }
-  .btn-ghost { border: 1px solid var(--line2); color: var(--text); background: rgba(255,255,255,.03); }
-  .btn-ghost:hover { background: rgba(255,255,255,.07); }
+  /* top line */
+  .top { display: flex; align-items: center; gap: 20px; padding: 22px 0 0; }
+  .brand { align-self: center; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; text-decoration: none; font: 20px var(--type); }
+  .brand img { width: 34px; height: 34px; filter: drop-shadow(0 3px 4px rgba(20,40,70,.25)); }
+  .top { align-items: flex-end; position: relative; padding-bottom: 0; }
+  /* the strip the nav tabs grow out of: a band of card stock along the top line */
+  .top::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 4px; background: var(--card); border-radius: 2px;
+                box-shadow: 0 2px 4px -2px rgba(30, 40, 60, .25); }
+  .top nav { margin-left: auto; display: flex; gap: 3px; font: 14px var(--type); }
+  .top nav a { text-decoration: none; color: var(--ink-soft); padding: 7px 13px 6px; border-radius: 7px 7px 0 0;
+               background: #cfe0ec; transform: translateY(2px); transition: transform .2s cubic-bezier(.2,.8,.2,1), background .2s, color .2s; }
+  .top nav a:hover { color: var(--ink); background: var(--card); transform: none; }
+  .lang { display: flex; gap: 2px; margin-left: 10px; padding-left: 10px; border-left: 1px solid rgba(30,28,26,.18); }
+  .lang button {
+    font: 13px var(--type); text-transform: uppercase; border: 0; cursor: pointer;
+    padding: 6px 10px 5px; border-radius: 6px 6px 0 0; background: #cfe0ec; color: var(--ink-soft);
+    transform: translateY(3px); transition: transform .2s cubic-bezier(.2,.8,.2,1), background .2s;
+  }
+  .lang button[aria-pressed="true"] { background: var(--card); color: var(--ink); transform: none; }
+  @media (max-width: 720px) { .top nav a:not(.gh) { display: none; } }
 
-  /* hero */
-  .hero { padding: 88px 0 40px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; }
-  @media (max-width: 920px) { .hero { grid-template-columns: 1fr; padding-top: 56px; } }
-  .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--accent2); padding: 6px 12px; border: 1px solid rgba(91,155,255,.3);
-    border-radius: 99px; background: rgba(91,155,255,.08); }
-  .eyebrow i { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 10px var(--ok); }
-  h1 { font: 700 clamp(40px, 6.4vw, 76px)/1.02 "Unbounded", sans-serif; letter-spacing: -.035em; margin: 22px 0 22px; }
-  h1 .tap { color: transparent; background: linear-gradient(180deg, var(--accent2), var(--accent)); -webkit-background-clip: text; background-clip: text; }
-  .lead { font-size: 19px; color: var(--dim); max-width: 520px; }
-  .cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 34px 0 16px; }
-  .req { color: var(--faint); font-size: 13.5px; }
+  /* the index card */
+  .card {
+    position: relative;
+    background-color: var(--card);
+    border-radius: 3px;
+    box-shadow: var(--lift);
+    background-image: repeating-linear-gradient(0deg, transparent 0 31px, var(--rule) 31px 32px);
+    --pad: 24px;
+  }
+  /* the red header rule of an index card: hangs off the heading, runs edge to edge */
+  .card .head { margin: 0 calc(-1 * var(--pad)); padding: 0 var(--pad) 14px; border-bottom: 2px solid var(--red); }
+  .card.gold { background-color: var(--gold); --rule: rgba(140, 90, 0, .16); }
+  .card.mint { background-color: var(--mint); --rule: rgba(40, 100, 50, .16); }
+  .card.rose { background-color: var(--rose); --rule: rgba(140, 40, 60, .14); }
 
-  /* hero visual: menu panel + live keyboard */
-  .stage { position: relative; display: grid; gap: 18px; justify-items: center; }
-  .panel { width: min(340px, 100%); background: #0c1120; border: 1px solid var(--line2); border-radius: 16px; overflow: hidden;
-    box-shadow: 0 40px 80px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(0,0,0,.4); transform: rotate(-1.2deg); }
-  .panel-head { display: flex; align-items: center; gap: 10px; padding: 13px 14px; border-bottom: 1px solid var(--line);
-    background: linear-gradient(#152241b3, #0c1120); }
-  .panel-head img { width: 30px; height: 30px; }
-  .panel-head b { display: block; font-size: 13.5px; }
-  .panel-head small { color: var(--dim); font-size: 11px; display: flex; align-items: center; gap: 5px; }
-  .panel-head small::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
-  .sw { margin-left: auto; width: 30px; height: 18px; border-radius: 99px; background: var(--accent); position: relative; }
-  .sw::after { content: ""; position: absolute; right: 2px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
-  .panel-body { padding: 12px; display: grid; gap: 6px; }
-  .label { color: var(--dim); font: 600 10px "Manrope"; letter-spacing: .08em; text-transform: uppercase; padding: 0 4px; }
-  .card { background: #131b2e; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-  .opt { display: flex; align-items: center; gap: 10px; padding: 8px 10px; font-size: 12.5px; cursor: pointer; transition: background .15s; }
-  .opt + .opt { border-top: 1px solid var(--line); }
-  .opt small { display: block; color: var(--dim); font-size: 10.5px; }
-  .opt .r { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #5d6b88; display: grid; place-items: center; flex: none; }
-  .opt.on { background: rgba(91,155,255,.1); font-weight: 600; }
-  .opt.on .r { border-color: var(--accent); }
-  .opt.on .r::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
-  .opt:hover:not(.on) { background: rgba(255,255,255,.03); }
+  /* hero card */
+  .hero { margin: 46px 0 0; }
+  .tabs { display: flex; gap: 4px; padding-left: 28px; position: relative; z-index: 1; }
+  .tabs button {
+    font: 14px var(--type); border: 0; cursor: pointer; color: var(--ink-soft);
+    padding: 9px 16px 8px; border-radius: 8px 8px 0 0;
+    background: #cfe0ec; transform: translateY(6px);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), background .2s, color .2s;
+  }
+  .tabs button:hover { transform: translateY(2px); }
+  .tabs button[aria-pressed="true"] { background: var(--card); color: var(--ink); transform: none; }
+  .tabs .tab-label { align-self: center; margin-right: 6px; font: 13px var(--type); color: var(--ink-soft); }
 
-  .board { display: grid; gap: 7px; padding: 16px; border-radius: 20px; background: linear-gradient(#111b33, #0b1224);
-    border: 1px solid var(--line2); box-shadow: 0 30px 60px -30px rgba(0,0,0,.9); width: min(520px, 100%); }
-  .krow { display: flex; gap: 7px; justify-content: center; }
-  .key { flex: 1; max-width: 44px; height: 44px; border-radius: 9px; display: grid; place-items: center; cursor: pointer; user-select: none;
-    font: 600 12px "Manrope"; color: #9fb0d4;
-    background: linear-gradient(#1d2a4a, #16213c); border: 1px solid rgba(255,255,255,.08);
-    box-shadow: 0 3px 0 #0a1020, 0 4px 10px rgba(0,0,0,.35);
-    transition: transform .06s ease, box-shadow .06s ease, background .15s, color .15s; }
-  .key.space { max-width: 260px; flex: 6; }
-  .key.down { transform: translateY(3px); box-shadow: 0 0 0 #0a1020, 0 0 22px rgba(91,155,255,.6);
-    background: linear-gradient(#8cc8ff, #4f8ef7); color: #061232; }
-  .hint { color: var(--faint); font-size: 13px; text-align: center; }
-  .hint kbd { font: 500 11px "JetBrains Mono"; padding: 2px 6px; border-radius: 5px; border: 1px solid var(--line2); color: var(--dim); }
+  .hero .card { --pad: clamp(22px, 5vw, 64px); padding: 34px var(--pad) 58px; }
+  .hero h1 { font-size: clamp(34px, 5.6vw, 66px); line-height: 1.05; }
+  .hero h1 .t { display: block; max-width: 15ch; }
+  .hero .lead { margin-top: 30px; max-width: 52ch; font-size: 18.5px; color: var(--ink-soft); line-height: 32px; }
 
-  /* sections */
-  section { padding: 96px 0 0; }
-  .sec-head { max-width: 640px; margin-bottom: 40px; }
-  h2 { font: 700 clamp(28px, 3.6vw, 42px)/1.1 "Unbounded", sans-serif; letter-spacing: -.03em; margin-top: 12px; }
-  .sec-head p { color: var(--dim); margin-top: 14px; font-size: 17px; }
+  .tryline { margin-top: 32px; max-width: 760px; }
+  .tryline label { display: block; font: 14px var(--type); color: var(--red); line-height: 32px; }
+  .note { font-size: 13.5px; line-height: 32px; color: var(--ink-soft); margin-top: -4px; }
+  .paper { font: 22px/32px var(--type); min-height: 64px; color: var(--ink); white-space: pre-wrap; word-break: break-word; cursor: text; border-radius: 2px; }
+  .paper .ch { display: inline-block; white-space: pre; }
+  .paper .ghost { color: #66625c; }
+  .caret { display: inline-block; width: .6em; height: 3px; background: var(--red); vertical-align: -2px; animation: blink 1.05s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .paper:focus { outline: none; }
+  .paper:focus-visible { outline: 2px dashed var(--red); outline-offset: 6px; }
 
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
-  .feat { padding: 24px; border-radius: var(--radius); background: linear-gradient(180deg, rgba(20,34,70,.55), rgba(12,20,40,.55));
-    border: 1px solid var(--line); transition: border-color .2s, transform .2s; }
-  .feat:hover { border-color: rgba(91,155,255,.35); transform: translateY(-3px); }
-  .ico { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; margin-bottom: 18px;
-    background: rgba(91,155,255,.12); border: 1px solid rgba(91,155,255,.25); color: var(--accent2); }
-  .ico svg { width: 20px; height: 20px; }
-  .feat h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
-  .feat p { color: var(--dim); font-size: 14.5px; }
+  .action { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 34px; margin-top: 28px; }
+  .stamp {
+    --ink-c: var(--red);
+    display: inline-flex; align-items: center; gap: 12px; text-decoration: none;
+    font: 700 19px var(--type); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-c);
+    padding: 14px 24px 13px; border: 3px solid var(--ink-c); border-radius: 9px;
+    box-shadow: inset 0 0 0 2px transparent, inset 0 0 0 4px var(--ink-c);
+    transform: rotate(-3.5deg);
+    transition: transform .18s cubic-bezier(.2,.8,.2,1), color .2s, border-color .2s, box-shadow .2s;
+    -webkit-mask: url("assets/stamp-mask.png") center / 100% 100% no-repeat;
+            mask: url("assets/stamp-mask.png") center / 100% 100% no-repeat;
+  }
+  .mint .stamp { --ink-c: var(--red-deep); }
+  .mint .stamp:hover { --ink-c: #7a1a15; }
+  .stamp svg { width: 20px; height: 20px; }
+  .stamp:hover { transform: rotate(-1.5deg) scale(1.03); --ink-c: var(--red-deep); }
+  .stamp:active { transform: rotate(-2deg) scale(.95); transition-duration: .06s; }
+  .req { font: 14px/32px var(--type); color: var(--ink-soft); margin-top: 38px; padding-left: 0; }
+  .src { font: 15px var(--type); color: var(--ink-soft); text-underline-offset: 5px; }
+  .src:hover { color: var(--red); }
 
-  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; counter-reset: s; }
-  @media (max-width: 860px) { .steps { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
-  .step { padding: 22px; border-radius: var(--radius); border: 1px solid var(--line); background: rgba(255,255,255,.02); position: relative; }
-  .step::before { counter-increment: s; content: "0" counter(s); font: 500 12px "JetBrains Mono"; color: var(--accent); display: block; margin-bottom: 14px; }
-  .step h3 { font-size: 16px; margin-bottom: 6px; }
-  .step p { color: var(--dim); font-size: 14px; }
-  .step code { font: 500 12.5px "JetBrains Mono"; color: var(--accent2); }
+  .hole { position: absolute; left: 50%; bottom: 18px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%;
+          background: var(--ground); box-shadow: inset 0 2px 3px rgba(20,40,70,.35); }
 
-  .faq { display: grid; gap: 10px; max-width: 820px; }
-  details { border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.02); padding: 0 20px; }
-  summary { cursor: pointer; list-style: none; padding: 18px 0; font-weight: 600; display: flex; justify-content: space-between; gap: 16px; }
+  section { padding-top: 100px; }
+  .sec-title { font-size: clamp(28px, 3.6vw, 40px); margin-bottom: 30px; }
+
+  .fan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 22px; }
+  .fan .card { padding: 20px var(--pad) 26px; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+  .fan .card:nth-child(1) { transform: rotate(-1.4deg); }
+  .fan .card:nth-child(2) { transform: rotate(.9deg) translateY(10px); }
+  .fan .card:nth-child(3) { transform: rotate(-.6deg); }
+  .fan .card:nth-child(4) { transform: rotate(1.2deg); }
+  .fan .card:nth-child(5) { transform: rotate(-1deg) translateY(8px); }
+  .fan .card:nth-child(6) { transform: rotate(.5deg); }
+  .fan .card:hover { transform: rotate(0) translateY(-6px); }
+  .fan h3 { font-size: 20px; line-height: 1.25; }
+  .fan p { margin-top: 14px; font-size: 16px; line-height: 32px; color: var(--ink-soft); }
+  .clip { position: absolute; top: -14px; right: 26px; width: 22px; height: 56px; }
+  @media (max-width: 900px) { .fan { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 580px) { .fan { grid-template-columns: 1fr; } .fan .card { transform: none !important; } }
+
+  .steps.card { padding: 26px 12px 30px; background-image: repeating-linear-gradient(0deg, transparent 0 39px, var(--rule) 39px 40px); }
+  .steps ol { list-style: none; counter-reset: s; position: relative; }
+  .steps ol::before { content: ""; position: absolute; left: 92px; top: -26px; bottom: -30px; border-left: 1px solid rgba(196,52,43,.6); }
+  .steps li { display: grid; grid-template-columns: 92px 1fr; align-items: baseline; padding: 4px clamp(18px, 4vw, 44px) 4px 0; line-height: 40px; font-size: 17px; }
+  .steps li::before { counter-increment: s; content: "0" counter(s); font: 18px var(--type); color: var(--red); text-align: right; padding-right: 26px; }
+  .steps li > span { padding-left: 24px; }
+  .steps code { font: 15.5px var(--type); }
+
+  .faq.card { padding: 8px clamp(18px, 4vw, 44px); background-image: none; }
+  details { border-bottom: 1px dashed rgba(120, 40, 50, .3); }
+  details:last-child { border-bottom: 0; }
+  summary { cursor: pointer; list-style: none; padding: 20px 0; font: 18px var(--type); display: flex; gap: 14px; align-items: baseline; }
   summary::-webkit-details-marker { display: none; }
-  summary::after { content: "+"; color: var(--accent); font-size: 20px; line-height: 1; transition: transform .2s; }
-  details[open] summary::after { transform: rotate(45deg); }
-  details p { color: var(--dim); padding: 0 0 18px; font-size: 15px; }
+  summary::before { content: "+"; color: var(--red); font: 20px var(--type); width: 14px; flex: none; transition: transform .25s; }
+  details[open] summary::before { transform: rotate(45deg); }
+  details p { padding: 0 0 22px 28px; max-width: 66ch; color: var(--ink-soft); }
 
-  .final { margin: 110px 0 0; padding: 56px 32px; border-radius: 26px; text-align: center; position: relative; overflow: hidden;
-    background: radial-gradient(600px 260px at 50% 0%, rgba(91,155,255,.28), transparent 70%), linear-gradient(#0f1a35, #0a1226);
-    border: 1px solid rgba(91,155,255,.25); }
-  .final img { width: 84px; height: 84px; margin-bottom: 18px; }
-  .final h2 { margin: 0 0 12px; }
-  .final p { color: var(--dim); margin-bottom: 28px; }
+  .close { padding: 110px 0 0; display: flex; justify-content: center; }
+  .close .card { --pad: 34px; width: min(700px, 100%); padding: 26px var(--pad) 64px; text-align: center; transform: rotate(-1deg); }
+  .close h2 { font-size: clamp(26px, 3.4vw, 36px); }
+  .close p { margin: 22px 0 26px; color: var(--ink-soft); line-height: 32px; }
 
-  footer { padding: 48px 0 40px; color: var(--faint); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; }
-  footer a:hover { color: var(--dim); }
+  footer { padding: 70px 0 44px; display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; font: 14px var(--type); color: var(--ink-soft); }
+  footer a { text-underline-offset: 4px; }
 
-  /* reveal on scroll */
-  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
-  .reveal.in { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .btn, .key, .feat { transition: none; } }
-
-  .lang { font: 600 12px "JetBrains Mono", monospace; letter-spacing: .06em; color: var(--text); background: rgba(255,255,255,.05);
-    border: 1px solid var(--line2); border-radius: 8px; height: 30px; padding: 0 10px; cursor: pointer; transition: background .15s; }
-  .lang:hover { background: rgba(255,255,255,.1); }
-  nav .links { align-items: center; }
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .hero { margin-top: 28px; }
+    .hero .card { padding-bottom: 64px; }
+    .hero .lead { margin-top: 24px; font-size: 17px; }
+    .tabs { padding-left: 10px; overflow-x: auto; }
+    .tabs .tab-label { display: none; }
+    .paper { font-size: 18px; }
+    .stamp { font-size: 16px; white-space: nowrap; padding: 12px 18px 11px; order: -1; }
+    .req { margin-top: 26px; line-height: 1.6; }
+    .steps li { grid-template-columns: 58px 1fr; }
+    .steps li::before { padding-right: 14px; }
+    .steps ol::before { left: 58px; }
+    .steps li > span { padding-left: 14px; }
+    section { padding-top: 76px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before { transition: none !important; animation: none !important; }
+  }
 </style>
 </head>
 <body>
-<div class="backdrop"></div>
 
-<nav>
-  <div class="wrap">
+<div class="wrap">
+  <header class="top">
     <a class="brand" href="#"><img src="assets/icon-512.png" alt="">Keytone</a>
-    <div class="links">
-      <a href="#features"><span data-i18n="nav.features">Возможности</span></a>
-      <a href="#install"><span data-i18n="nav.install">Установка</span></a>
-      <a href="#faq"><span data-i18n="nav.faq">Вопросы</span></a>
+    <nav>
+      <a href="#inside" data-i18n="nav.inside">Что внутри</a>
+      <a href="#install" data-i18n="nav.install">Как поставить</a>
+      <a href="#faq" data-i18n="nav.faq">Вопросы</a>
       <a class="gh js-repo" href="#">GitHub</a>
-      <button class="lang js-lang" type="button" aria-label="Switch language">EN</button>
-    </div>
-  </div>
-</nav>
-
-<main class="wrap">
-  <header class="hero">
-    <div>
-      <span class="eyebrow mono"><i></i><span data-i18n="hero.eyebrow">macOS · бесплатно · открытый код</span></span>
-      <h1><span data-i18n="hero.title">Каждое нажатие — <span class="tap">звучит.</span></span></h1>
-      <p class="lead"><span data-i18n="hero.lead">Keytone добавляет macOS приятный звук механической клавиатуры и мыши. Без окон и настроек на полдня: иконка в строке меню, и всё.</span></p>
-      <div class="cta">
-        <a class="btn btn-primary js-download" href="#">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
-          <span data-i18n="cta.download">Скачать для macOS</span>
-        </a>
-        <a class="btn btn-ghost js-repo" href="#">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.4c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
-          <span data-i18n="cta.source">Исходный код</span>
-        </a>
-      </div>
-      <p class="req"><span data-i18n="hero.req">macOS 14 Sonoma и новее · Apple Silicon и Intel · 3 МБ</span></p>
-    </div>
-
-    <div class="stage reveal">
-      <div class="panel" aria-hidden="true">
-        <div class="panel-head">
-          <img src="assets/icon-512.png" alt="">
-          <div><b>Keytone</b><small class="js-current">Creamy Legendary</small></div>
-          <div class="sw"></div>
-        </div>
-        <div class="panel-body">
-          <div class="label"><span data-i18n="panel.label">Звук клавиатуры</span></div>
-          <div class="card js-profiles">
-            <div class="opt on" data-p="cream"><span class="r"></span><div>Creamy Legendary<small><span data-i18n="panel.p1">мягкий, глубокий</span></small></div></div>
-            <div class="opt" data-p="tactile"><span class="r"></span><div>Zoom TKL Morandi<small><span data-i18n="panel.p2">сливочный, тактильный</span></small></div></div>
-            <div class="opt" data-p="clicky"><span class="r"></span><div>Keychron Q3 Blue<small><span data-i18n="panel.p3">звонкий, кликающий</span></small></div></div>
-          </div>
-        </div>
-      </div>
-      <div class="board js-board" aria-label="Keyboard demo"></div>
-      <p class="hint"><span data-i18n="hero.hint">Попробуйте прямо здесь: печатайте на клавиатуре или кликайте по клавишам</span></p>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
     </div>
   </header>
 
-  <section id="features">
-    <div class="sec-head reveal">
-      <span class="mono" style="color:var(--accent)"><span data-i18n="nav.features">Возможности</span></span>
-      <h2><span data-i18n="feat.title">Маленькое приложение. Большая разница.</span></h2>
-      <p><span data-i18n="feat.lead">Всё, что нужно, — и ничего лишнего. Keytone не мешает работать и почти не тратит ресурсы.</span></p>
-    </div>
-    <div class="grid">
-      <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M7 10h.01M11 10h.01M15 10h.01M8 14h8"/></svg></div>
-        <h3><span data-i18n="f1.t">Реальные записи свитчей</span></h3><p><span data-i18n="f1.d">Пять встроенных паков: от мягкого «thock» до звонкого клика. У каждой клавиши свой звук нажатия и отпускания.</span></p></div>
-      <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="5"/><path d="M12 7v3"/></svg></div>
-        <h3><span data-i18n="f2.t">Звук мыши</span></h3><p><span data-i18n="f2.d">Отдельные звуки для левой и правой кнопки и колеса. Колесо можно выключить отдельно.</span></p></div>
-      <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h2M8 8v8M12 5v14M16 8v8M20 12h-2"/></svg></div>
-        <h3><span data-i18n="f3.t">Живой звук</span></h3><p><span data-i18n="f3.d">Лёгкий разброс тона и стерео-панорама по положению клавиши — печать не звучит как робот.</span></p></div>
-      <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></div>
-        <h3><span data-i18n="f4.t">Паки Mechvibes</span></h3><p><span data-i18n="f4.d">Импортируйте любой пак Mechvibes (v1 и v2) — папкой или .zip. Включая .ogg.</span></p></div>
-      <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 3L5 13h6l-1 8 8-10h-6l1-8z"/></svg></div>
-        <h3><span data-i18n="f5.t">Без задержки</span></h3><p><span data-i18n="f5.d">Нативное приложение на Swift и AVAudioEngine. Быстрая печать не обрывает звуки, а накладывает их.</span></p></div>
-      <div class="feat reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
-        <h3><span data-i18n="f6.t">Приватно</span></h3><p><span data-i18n="f6.d">Keytone только слушает факт нажатия, чтобы проиграть звук. Ничего не записывает и никуда не отправляет.</span></p></div>
-    </div>
-  </section>
+  <main>
+    <div class="hero">
+      <div class="tabs" role="group" aria-label="Sound">
+        <span class="tab-label" data-i18n="tabs.label">звук:</span>
+        <button type="button" data-pack="cream" aria-pressed="true">Creamy</button>
+        <button type="button" data-pack="morandi" aria-pressed="false">Morandi</button>
+        <button type="button" data-pack="blue" aria-pressed="false">Keychron Blue</button>
+      </div>
+      <div class="card">
+        <h1 class="typed head"><span class="t js-type" data-i18n="hero.title">Клавиатура, которая звучит по-настоящему.</span></h1>
+        <p class="lead" data-i18n="hero.lead">Keytone: маленькая программа для macOS. Она тихо сидит в строке меню и добавляет каждому нажатию звук живой механической клавиатуры. Настраивать ничего не нужно.</p>
 
-  <section id="install">
-    <div class="sec-head reveal">
-      <span class="mono" style="color:var(--accent)"><span data-i18n="nav.install">Установка</span></span>
-      <h2><span data-i18n="inst.title">Четыре шага — и готово</span></h2>
-    </div>
-    <div class="steps">
-      <div class="step reveal"><h3><span data-i18n="s1.t">Скачайте</span></h3><p><span data-i18n="s1.d">Архив <code>Keytone.zip</code> со страницы релизов и распакуйте.</span></p></div>
-      <div class="step reveal"><h3><span data-i18n="s2.t">Перенесите</span></h3><p><span data-i18n="s2.d">Перетащите <code>Keytone.app</code> в папку «Программы».</span></p></div>
-      <div class="step reveal"><h3><span data-i18n="s3.t">Откройте</span></h3><p><span data-i18n="s3.d">macOS предупредит, что разработчик не проверен. Откройте «Настройки → Конфиденциальность и безопасность» и нажмите «Всё равно открыть».</span></p></div>
-      <div class="step reveal"><h3><span data-i18n="s4.t">Разрешите</span></h3><p><span data-i18n="s4.d">«Настройки → Конфиденциальность → Мониторинг ввода» → включите Keytone.</span></p></div>
-    </div>
-  </section>
+        <div class="tryline">
+          <label for="paper" data-i18n="try.label">Попробуйте, напечатайте что-нибудь:</label>
+          <p class="note" data-i18n="try.note">В браузере звучит упрощённая имитация. В приложении — настоящие записи клавиатур.</p>
+          <div class="paper js-paper" id="paper" tabindex="0" role="textbox" aria-label="Demo"><span class="ghost">ваш текст появится здесь</span><span class="caret"></span></div>
+        </div>
 
-  <section id="faq">
-    <div class="sec-head reveal">
-      <span class="mono" style="color:var(--accent)"><span data-i18n="nav.faq">Вопросы</span></span>
-      <h2><span data-i18n="faq.title">Частые вопросы</span></h2>
+        <div class="action">
+          <a class="src js-repo" href="#" data-i18n="cta.source">Исходный код на GitHub</a>
+          <a class="stamp js-download" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
+            <span data-i18n="cta.download">Скачать для macOS</span>
+          </a>
+        </div>
+        <p class="req" data-i18n="hero.req">macOS 14 и новее · Apple Silicon и Intel · 3 МБ · бесплатно</p>
+        <span class="hole" aria-hidden="true"></span>
+      </div>
     </div>
-    <div class="faq">
-      <details class="reveal"><summary><span data-i18n="q1">Зачем доступ «Мониторинг ввода»?</span></summary>
-        <p><span data-i18n="a1">Без него macOS не сообщает приложениям о нажатиях клавиш. Keytone узнаёт только «клавиша нажата», чтобы проиграть звук, — текст не сохраняется и никуда не уходит. Код открыт, это можно проверить.</span></p></details>
-      <details class="reveal"><summary><span data-i18n="q2">macOS пишет, что приложение от неустановленного разработчика</span></summary>
-        <p><span data-i18n="a2">Keytone распространяется бесплатно и не подписан сертификатом Apple. Попробуйте открыть его один раз, затем зайдите в «Настройки → Конфиденциальность и безопасность» и нажмите «Всё равно открыть». На macOS 14 также работает правый клик → «Открыть».</span></p></details>
-      <details class="reveal"><summary><span data-i18n="q3">Где окно приложения?</span></summary>
-        <p><span data-i18n="a3">Его нет — Keytone живёт в строке меню (иконка клавиатуры вверху экрана). Там все настройки.</span></p></details>
-      <details class="reveal"><summary><span data-i18n="q4">Как добавить свой звук?</span></summary>
-        <p><span data-i18n="a4">Скачайте пак Mechvibes и выберите в меню «Импорт пака». Подходят папки и .zip, форматы v1 и v2.</span></p></details>
-      <details class="reveal"><summary><span data-i18n="q5">Как удалить?</span></summary>
-        <p><span data-i18n="a5">Выйдите из Keytone в меню и перетащите приложение из «Программ» в Корзину.</span></p></details>
-    </div>
-  </section>
 
-  <div class="final reveal">
-    <img src="assets/icon-512.png" alt="Keytone">
-    <h2><span data-i18n="final.title">Сделайте печать приятной</span></h2>
-    <p><span data-i18n="final.lead">Бесплатно. Открытый код. 3 мегабайта.</span></p>
-    <a class="btn btn-primary js-download" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
-      <span data-i18n="final.cta">Скачать Keytone</span>
-    </a>
-  </div>
+    <section id="inside">
+      <h2 class="sec-title typed js-ink" data-i18n="inside.title">Что внутри</h2>
+      <div class="fan">
+        <article class="card">
+          <svg class="clip" viewBox="0 0 22 56" fill="none" stroke="#7d8892" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M7 20V8a4 4 0 0 1 8 0v34a6 6 0 0 1-12 0V14"/></svg>
+          <h3 class="typed js-ink head" data-i18n="f1.t">Настоящие записи</h3>
+          <p data-i18n="f1.d">Пять паков, записанных с живых клавиатур. У каждой клавиши свой звук нажатия и отпускания.</p>
+        </article>
+        <article class="card gold">
+          <h3 class="typed js-ink head" data-i18n="f2.t">Быстро, но не каша</h3>
+          <p data-i18n="f2.d">Когда печатаете быстро, звуки не сливаются: каждое нажатие слышно отдельно.</p>
+        </article>
+        <article class="card mint">
+          <h3 class="typed js-ink head" data-i18n="f3.t">Мышь тоже</h3>
+          <p data-i18n="f3.d">Щелчки левой и правой кнопки и прокрутки. Прокрутку можно выключить отдельно.</p>
+        </article>
+        <article class="card rose">
+          <h3 class="typed js-ink head" data-i18n="f4.t">Mac почти не замечает</h3>
+          <p data-i18n="f4.d">В простое около 1% процессора. Ни окон, ни лишних значков, только иконка в строке меню.</p>
+        </article>
+        <article class="card">
+          <h3 class="typed js-ink head" data-i18n="f5.t">Свои звуки</h3>
+          <p data-i18n="f5.d">Подходит любой пак Mechvibes: папкой или архивом .zip.</p>
+        </article>
+        <article class="card gold">
+          <h3 class="typed js-ink head" data-i18n="f6.t">Ничего не записывает</h3>
+          <p data-i18n="f6.d">Keytone слышит только сам факт нажатия, чтобы сыграть звук. Ваш текст никуда не уходит.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2 class="sec-title typed js-ink" data-i18n="install.title">Как поставить</h2>
+      <div class="steps card gold">
+        <ol>
+          <li><span data-i18n="s1">Скачайте <code>Keytone.zip</code> и распакуйте.</span></li>
+          <li><span data-i18n="s2">Перетащите Keytone в папку «Программы».</span></li>
+          <li><span data-i18n="s3">Откройте его. macOS предупредит, что разработчик не проверен: зайдите в «Настройки → Конфиденциальность и безопасность» и нажмите «Всё равно открыть».</span></li>
+          <li><span data-i18n="s4">Разрешите Keytone «Мониторинг ввода». Можно печатать.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2 class="sec-title typed js-ink" data-i18n="faq.title">Вопросы</h2>
+      <div class="faq card rose">
+        <details><summary data-i18n="q1">Зачем ему «Мониторинг ввода»?</summary>
+          <p data-i18n="a1">Без этого macOS не сообщает программам о нажатиях клавиш. Keytone узнаёт только «клавиша нажата», чтобы сыграть звук. Текст не сохраняется и никуда не отправляется. Код открыт, это можно проверить.</p></details>
+        <details><summary data-i18n="q2">macOS пишет, что разработчик не проверен</summary>
+          <p data-i18n="a2">Keytone бесплатный и не подписан сертификатом Apple. Откройте его один раз, затем в «Настройки → Конфиденциальность и безопасность» нажмите «Всё равно открыть». На macOS 14 работает и правый клик → «Открыть».</p></details>
+        <details><summary data-i18n="q3">А где окно программы?</summary>
+          <p data-i18n="a3">Окна нет. Keytone живёт в строке меню: это иконка клавиши вверху экрана. Там все настройки.</p></details>
+        <details><summary data-i18n="q4">Можно добавить свой звук?</summary>
+          <p data-i18n="a4">Да. Скачайте пак Mechvibes и нажмите в меню «Добавить пак…». Подходят папки и .zip.</p></details>
+        <details><summary data-i18n="q5">Как удалить?</summary>
+          <p data-i18n="a5">Выйдите из Keytone через меню и перетащите программу из «Программ» в Корзину.</p></details>
+      </div>
+    </section>
+
+    <div class="close">
+      <div class="card mint">
+        <h2 class="typed js-ink head" data-i18n="close.title">Печатайте с удовольствием.</h2>
+        <p data-i18n="close.lead">Бесплатно, с открытым кодом, три мегабайта.</p>
+        <a class="stamp js-download" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
+          <span data-i18n="close.cta">Скачать Keytone</span>
+        </a>
+        <span class="hole" aria-hidden="true"></span>
+      </div>
+    </div>
+  </main>
 
   <footer>
-    <span><span data-i18n="footer">© Keytone · Звуковые паки принадлежат их авторам</span></span>
+    <span data-i18n="footer">Keytone · звуки принадлежат авторам паков</span>
     <a class="js-repo" href="#">GitHub</a>
   </footer>
-</main>
+</div>
 
 <script>
+(function () {
+  var host = location.hostname, path = location.pathname.split('/').filter(Boolean);
+  var owner = host.endsWith('.github.io') ? host.replace('.github.io', '') : null;
+  var repo = owner ? (path[0] || owner + '.github.io') : null;
+  var base = owner ? 'https://github.com/' + owner + '/' + repo : 'https://github.com/aristocratonly/keytone';
+  document.querySelectorAll('.js-repo').forEach(function (a) { a.href = base; });
+  document.querySelectorAll('.js-download').forEach(function (a) { a.href = base + '/releases/latest/download/Keytone.zip'; });
+})();
 
-/* ---- i18n: RU / EN ---- */
-var I18N = { ru: {"nav.features": "Возможности", "nav.install": "Установка", "nav.faq": "Вопросы", "hero.eyebrow": "macOS · бесплатно · открытый код", "hero.title": "Каждое нажатие — <span class=\"tap\">звучит.</span>", "hero.lead": "Keytone добавляет macOS приятный звук механической клавиатуры и мыши. Без окон и настроек на полдня: иконка в строке меню, и всё.", "cta.download": "Скачать для macOS", "cta.source": "Исходный код", "hero.req": "macOS 14 Sonoma и новее · Apple Silicon и Intel · 3 МБ", "panel.label": "Звук клавиатуры", "panel.p1": "мягкий, глубокий", "panel.p2": "сливочный, тактильный", "panel.p3": "звонкий, кликающий", "hero.hint": "Попробуйте прямо здесь: печатайте на клавиатуре или кликайте по клавишам", "feat.title": "Маленькое приложение. Большая разница.", "feat.lead": "Всё, что нужно, — и ничего лишнего. Keytone не мешает работать и почти не тратит ресурсы.", "f1.t": "Реальные записи свитчей", "f1.d": "Пять встроенных паков: от мягкого «thock» до звонкого клика. У каждой клавиши свой звук нажатия и отпускания.", "f2.t": "Звук мыши", "f2.d": "Отдельные звуки для левой и правой кнопки и колеса. Колесо можно выключить отдельно.", "f3.t": "Живой звук", "f3.d": "Лёгкий разброс тона и стерео-панорама по положению клавиши — печать не звучит как робот.", "f4.t": "Паки Mechvibes", "f4.d": "Импортируйте любой пак Mechvibes (v1 и v2) — папкой или .zip. Включая .ogg.", "f5.t": "Без задержки", "f5.d": "Нативное приложение на Swift и AVAudioEngine. Быстрая печать не обрывает звуки, а накладывает их.", "f6.t": "Приватно", "f6.d": "Keytone только слушает факт нажатия, чтобы проиграть звук. Ничего не записывает и никуда не отправляет.", "inst.title": "Четыре шага — и готово", "s1.t": "Скачайте", "s1.d": "Архив <code>Keytone.zip</code> со страницы релизов и распакуйте.", "s2.t": "Перенесите", "s2.d": "Перетащите <code>Keytone.app</code> в папку «Программы».", "s3.t": "Откройте", "s3.d": "macOS предупредит, что разработчик не проверен. Откройте «Настройки → Конфиденциальность и безопасность» и нажмите «Всё равно открыть».", "s4.t": "Разрешите", "s4.d": "«Настройки → Конфиденциальность → Мониторинг ввода» → включите Keytone.", "faq.title": "Частые вопросы", "q1": "Зачем доступ «Мониторинг ввода»?", "a1": "Без него macOS не сообщает приложениям о нажатиях клавиш. Keytone узнаёт только «клавиша нажата», чтобы проиграть звук, — текст не сохраняется и никуда не уходит. Код открыт, это можно проверить.", "q2": "macOS пишет, что приложение от неустановленного разработчика", "a2": "Keytone распространяется бесплатно и не подписан сертификатом Apple. Попробуйте открыть его один раз, затем зайдите в «Настройки → Конфиденциальность и безопасность» и нажмите «Всё равно открыть». На macOS 14 также работает правый клик → «Открыть».", "q3": "Где окно приложения?", "a3": "Его нет — Keytone живёт в строке меню (иконка клавиатуры вверху экрана). Там все настройки.", "q4": "Как добавить свой звук?", "a4": "Скачайте пак Mechvibes и выберите в меню «Импорт пака». Подходят папки и .zip, форматы v1 и v2.", "q5": "Как удалить?", "a5": "Выйдите из Keytone в меню и перетащите приложение из «Программ» в Корзину.", "final.title": "Сделайте печать приятной", "final.lead": "Бесплатно. Открытый код. 3 мегабайта.", "final.cta": "Скачать Keytone", "footer": "© Keytone · Звуковые паки принадлежат их авторам"}, en: {"nav.features": "Features", "nav.install": "Install", "nav.faq": "FAQ", "hero.eyebrow": "macOS · free · open source", "hero.title": "Every keystroke <span class=\"tap\">sounds good.</span>", "hero.lead": "Keytone gives macOS the satisfying sound of a mechanical keyboard and mouse. No windows, no endless settings — just an icon in the menu bar.", "cta.download": "Download for macOS", "cta.source": "Source code", "hero.req": "macOS 14 Sonoma or later · Apple Silicon &amp; Intel · 3 MB", "panel.label": "Keyboard sound", "panel.p1": "soft, deep", "panel.p2": "creamy, tactile", "panel.p3": "crisp, clicky", "hero.hint": "Try it right here: type on your keyboard or click the keys", "feat.title": "Tiny app. Big difference.", "feat.lead": "Everything you need, nothing you don’t. Keytone stays out of your way and barely uses any resources.", "f1.t": "Real switch recordings", "f1.d": "Five built-in packs, from a soft “thock” to a crisp click. Every key has its own press and release sound.", "f2.t": "Mouse sounds", "f2.d": "Separate sounds for left and right buttons and the scroll wheel. The wheel can be muted on its own.", "f3.t": "Natural feel", "f3.d": "Subtle pitch variation and stereo panning by key position, so typing never sounds robotic.", "f4.t": "Mechvibes packs", "f4.d": "Import any Mechvibes pack (v1 and v2) as a folder or .zip, .ogg included.", "f5.t": "Zero lag", "f5.d": "Native Swift app on AVAudioEngine. Fast typing layers sounds instead of cutting them off.", "f6.t": "Private", "f6.d": "Keytone only notices that a key was pressed to play a sound. It records nothing and sends nothing.", "inst.title": "Four steps and you’re done", "s1.t": "Download", "s1.d": "Get <code>Keytone.zip</code> from the releases page and unzip it.", "s2.t": "Move", "s2.d": "Drag <code>Keytone.app</code> into your Applications folder.", "s3.t": "Open", "s3.d": "macOS will warn that the developer can’t be verified. Go to System Settings → Privacy &amp; Security and click “Open Anyway”.", "s4.t": "Allow", "s4.d": "System Settings → Privacy &amp; Security → Input Monitoring → turn on Keytone.", "faq.title": "Frequently asked questions", "q1": "Why does it need Input Monitoring?", "a1": "Without it, macOS doesn’t tell apps about key presses. Keytone only learns “a key was pressed” to play a sound — no text is stored or sent anywhere. The code is open, so you can check.", "q2": "macOS says the app is from an unidentified developer", "a2": "Keytone is free and isn’t signed with an Apple certificate. Try opening it once, then go to System Settings → Privacy &amp; Security and click “Open Anyway”. On macOS 14, right-click → Open also works.", "q3": "Where is the app window?", "a3": "There isn’t one — Keytone lives in the menu bar (the keyboard icon at the top of the screen). All settings are there.", "q4": "How do I add my own sound?", "a4": "Download a Mechvibes pack and choose “Import pack” in the menu. Folders and .zip files, v1 and v2, are supported.", "q5": "How do I uninstall it?", "a5": "Quit Keytone from its menu and drag the app from Applications to the Trash.", "final.title": "Make typing feel good", "final.lead": "Free. Open source. 3 megabytes.", "final.cta": "Download Keytone", "footer": "© Keytone · Sound packs belong to their authors"} };
-var META = {
-  ru: { title: "Keytone — звук клавиатуры для macOS", desc: "Keytone — бесплатное приложение для macOS: приятный звук механической клавиатуры и мыши при каждом нажатии. Живёт в строке меню." },
-  en: { title: "Keytone — keyboard sounds for macOS", desc: "Keytone is a free macOS app that plays satisfying mechanical keyboard and mouse sounds on every press. Lives in the menu bar." }
+/* uneven ribbon ink: every letter sits a hair off, like a real typewriter */
+function ink(el) {
+  var text = el.textContent; el.textContent = '';
+  var seed = text.length * 7 + 3;
+  function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  text.split(/(\s+)/).forEach(function (part) {
+    if (!part) return;
+    if (/^\s+$/.test(part)) { el.appendChild(document.createTextNode(part)); return; }
+    var word = document.createElement('span'); word.style.whiteSpace = 'nowrap';
+    for (var i = 0; i < part.length; i++) {
+      var c = document.createElement('span'); c.className = 'ch'; c.textContent = part[i];
+      c.style.transform = 'translateY(' + ((rnd() - .5) * 1.6).toFixed(2) + 'px) rotate(' + ((rnd() - .5) * 1.4).toFixed(2) + 'deg)';
+      c.style.opacity = (.8 + rnd() * .2).toFixed(2);
+      word.appendChild(c);
+    }
+    el.appendChild(word);
+  });
+}
+
+var I18N = {
+  ru: {
+    "nav.inside": "Что внутри", "nav.install": "Как поставить", "nav.faq": "Вопросы",
+    "tabs.label": "звук:",
+    "hero.title": "Клавиатура, которая звучит по-настоящему.",
+    "hero.lead": "Keytone: маленькая программа для macOS. Она тихо сидит в строке меню и добавляет каждому нажатию звук живой механической клавиатуры. Настраивать ничего не нужно.",
+    "try.label": "Попробуйте, напечатайте что-нибудь:", "try.note": "В браузере звучит упрощённая имитация. В приложении — настоящие записи клавиатур.", "try.ghost": "ваш текст появится здесь",
+    "cta.download": "Скачать для macOS", "cta.source": "Исходный код на GitHub",
+    "hero.req": "macOS 14 и новее · Apple Silicon и Intel · 3 МБ · бесплатно",
+    "inside.title": "Что внутри",
+    "f1.t": "Настоящие записи", "f1.d": "Пять паков, записанных с живых клавиатур. У каждой клавиши свой звук нажатия и отпускания.",
+    "f2.t": "Быстро, но не каша", "f2.d": "Когда печатаете быстро, звуки не сливаются: каждое нажатие слышно отдельно.",
+    "f3.t": "Мышь тоже", "f3.d": "Щелчки левой и правой кнопки и прокрутки. Прокрутку можно выключить отдельно.",
+    "f4.t": "Mac почти не замечает", "f4.d": "В простое около 1% процессора. Ни окон, ни лишних значков, только иконка в строке меню.",
+    "f5.t": "Свои звуки", "f5.d": "Подходит любой пак Mechvibes: папкой или архивом .zip.",
+    "f6.t": "Ничего не записывает", "f6.d": "Keytone слышит только сам факт нажатия, чтобы сыграть звук. Ваш текст никуда не уходит.",
+    "install.title": "Как поставить",
+    "s1": "Скачайте <code>Keytone.zip</code> и распакуйте.",
+    "s2": "Перетащите Keytone в папку «Программы».",
+    "s3": "Откройте его. macOS предупредит, что разработчик не проверен: зайдите в «Настройки → Конфиденциальность и безопасность» и нажмите «Всё равно открыть».",
+    "s4": "Разрешите Keytone «Мониторинг ввода». Можно печатать.",
+    "faq.title": "Вопросы",
+    "q1": "Зачем ему «Мониторинг ввода»?",
+    "a1": "Без этого macOS не сообщает программам о нажатиях клавиш. Keytone узнаёт только «клавиша нажата», чтобы сыграть звук. Текст не сохраняется и никуда не отправляется. Код открыт, это можно проверить.",
+    "q2": "macOS пишет, что разработчик не проверен",
+    "a2": "Keytone бесплатный и не подписан сертификатом Apple. Откройте его один раз, затем в «Настройки → Конфиденциальность и безопасность» нажмите «Всё равно открыть». На macOS 14 работает и правый клик → «Открыть».",
+    "q3": "А где окно программы?",
+    "a3": "Окна нет. Keytone живёт в строке меню: это иконка клавиши вверху экрана. Там все настройки.",
+    "q4": "Можно добавить свой звук?",
+    "a4": "Да. Скачайте пак Mechvibes и нажмите в меню «Добавить пак…». Подходят папки и .zip.",
+    "q5": "Как удалить?",
+    "a5": "Выйдите из Keytone через меню и перетащите программу из «Программ» в Корзину.",
+    "close.title": "Печатайте с удовольствием.", "close.lead": "Бесплатно, с открытым кодом, три мегабайта.", "close.cta": "Скачать Keytone",
+    "footer": "Keytone · звуки принадлежат авторам паков"
+  },
+  en: {
+    "nav.inside": "What’s inside", "nav.install": "Install", "nav.faq": "Questions",
+    "tabs.label": "sound:",
+    "hero.title": "A keyboard that sounds like the real thing.",
+    "hero.lead": "Keytone is a small app for macOS. It sits quietly in the menu bar and gives every keypress the sound of a real mechanical keyboard. Nothing to set up.",
+    "try.label": "Go on, type something:", "try.note": "In the browser you hear a simplified imitation. The app plays real keyboard recordings.", "try.ghost": "your words show up here",
+    "cta.download": "Download for macOS", "cta.source": "Source code on GitHub",
+    "hero.req": "macOS 14 or later · Apple Silicon &amp; Intel · 3 MB · free",
+    "inside.title": "What’s inside",
+    "f1.t": "Real recordings", "f1.d": "Five packs recorded from real keyboards. Every key has its own press and release sound.",
+    "f2.t": "Fast, not mushy", "f2.d": "Type fast and the sounds don’t blur together: you hear every single press.",
+    "f3.t": "The mouse too", "f3.d": "Left and right clicks and scrolling. Scroll sound can be muted on its own.",
+    "f4.t": "Your Mac barely notices", "f4.d": "About 1% CPU when idle. No windows, no clutter, just an icon in the menu bar.",
+    "f5.t": "Your own sounds", "f5.d": "Works with any Mechvibes pack, as a folder or a .zip.",
+    "f6.t": "Records nothing", "f6.d": "Keytone only notices that a key was pressed so it can play a sound. Your words go nowhere.",
+    "install.title": "How to install",
+    "s1": "Download <code>Keytone.zip</code> and unzip it.",
+    "s2": "Drag Keytone into your Applications folder.",
+    "s3": "Open it. macOS will warn that the developer can’t be verified: go to System Settings → Privacy &amp; Security and click “Open Anyway”.",
+    "s4": "Allow Keytone in Input Monitoring. Start typing.",
+    "faq.title": "Questions",
+    "q1": "Why does it need Input Monitoring?",
+    "a1": "Without it, macOS doesn’t tell apps about key presses. Keytone only learns “a key was pressed” so it can play a sound. Nothing is stored or sent anywhere. The code is open, so you can check.",
+    "q2": "macOS says the developer can’t be verified",
+    "a2": "Keytone is free and isn’t signed with an Apple certificate. Open it once, then go to System Settings → Privacy &amp; Security and click “Open Anyway”. On macOS 14, right-click → Open works too.",
+    "q3": "Where’s the app window?",
+    "a3": "There isn’t one. Keytone lives in the menu bar: the little key icon at the top of the screen. All the settings are there.",
+    "q4": "Can I add my own sound?",
+    "a4": "Yes. Download a Mechvibes pack and click “Add pack…” in the menu. Folders and .zip files both work.",
+    "q5": "How do I uninstall it?",
+    "a5": "Quit Keytone from its menu and drag it from Applications to the Trash.",
+    "close.title": "Enjoy your typing.", "close.lead": "Free, open source, three megabytes.", "close.cta": "Download Keytone",
+    "footer": "Keytone · sounds belong to their pack authors"
+  }
 };
-function setLang(lang) {
+var META = {
+  ru: { title: "Keytone — звук клавиатуры для macOS", desc: "Keytone — бесплатная программа для macOS: живой звук механической клавиатуры и мыши при каждом нажатии. Сидит в строке меню." },
+  en: { title: "Keytone — keyboard sounds for macOS", desc: "Keytone is a free macOS app that gives every keypress the sound of a real mechanical keyboard. Lives in the menu bar." }
+};
+var currentLang = 'ru';
+function setLang(lang, animate) {
+  currentLang = lang;
   var dict = I18N[lang];
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-i18n]').forEach(function (el) {
     var v = dict[el.getAttribute('data-i18n')]; if (v != null) el.innerHTML = v;
   });
+  document.querySelectorAll('.js-ink').forEach(ink);
+  typeHeadline(animate);
   document.title = META[lang].title;
   var md = document.querySelector('meta[name="description"]'); if (md) md.content = META[lang].desc;
-  var b = document.querySelector('.js-lang'); if (b) b.textContent = lang === 'ru' ? 'EN' : 'RU';
+  document.querySelectorAll('.lang button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.lang === lang); });
+  resetPaper();
   try { localStorage.setItem('keytone-lang', lang); } catch (e) {}
 }
+
+/* the one authored moment: the headline types itself onto the card */
+var typingTimer = null;
+function typeHeadline(animate) {
+  var h = document.querySelector('.js-type');
+  clearTimeout(typingTimer);
+  ink(h);
+  if (!animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var chars = h.querySelectorAll('.ch');
+  chars.forEach(function (c) { c.dataset.o = c.style.opacity; c.style.opacity = 0; });
+  var i = 0;
+  (function next() {
+    if (i >= chars.length) return;
+    chars[i].style.opacity = chars[i].dataset.o; i++;
+    typingTimer = setTimeout(next, 26 + Math.random() * 46);
+  })();
+}
+
+/* live typing with a small WebAudio "thock" */
+var profiles = {
+  cream:   { f: [175, 330, 980],  q: [7, 5, 4],  g: [1, .55, .14],  cut: 2600, ex: .0032 },
+  morandi: { f: [290, 720, 2100], q: [6, 7, 7],  g: [.7, .45, .22], cut: 5200, ex: .0016 },
+  blue:    { f: [420, 2300, 4200], q: [5, 10, 3], g: [.45, .35, .5], cut: 7500, ex: .0012 }
+};
+var pack = 'cream', ctx = null;
+function thock(isUp, space) {
+  try {
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    var p = profiles[pack], t = ctx.currentTime, sr = ctx.sampleRate;
+    var len = Math.floor(sr * p.ex * (isUp ? .8 : 1)), buf = ctx.createBuffer(1, len, sr), d = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = (Math.random() * 1.2 - .2) * (0.5 - 0.5 * Math.cos(2 * Math.PI * i / (len - 1)));
+    var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = p.cut;
+    var out = ctx.createGain(); out.gain.value = (isUp ? .18 : .5) * (space ? 1.1 : 1);
+    lp.connect(out); out.connect(ctx.destination);
+    var pitch = (isUp ? 1.12 : 1) * (space ? .7 : 1) * (1 + (Math.random() - .5) * .06);
+    p.f.forEach(function (f, i) {
+      var src = ctx.createBufferSource(); src.buffer = buf;
+      var bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f * pitch; bp.Q.value = p.q[i];
+      var g = ctx.createGain(); g.gain.value = p.g[i] * 6;
+      src.connect(bp); bp.connect(g); g.connect(lp); src.start(t);
+    });
+  } catch (e) {}
+}
+
+var paper = document.querySelector('.js-paper'), typedText = '';
+function renderPaper() {
+  paper.innerHTML = '';
+  if (!typedText) {
+    var g = document.createElement('span'); g.className = 'ghost'; g.textContent = I18N[currentLang]['try.ghost'];
+    paper.appendChild(g);
+  } else {
+    for (var i = 0; i < typedText.length; i++) {
+      var c = document.createElement('span'); c.className = 'ch'; c.textContent = typedText[i];
+      var r = Math.sin((i + 1) * 12.9898) * 43758.5453; r = r - Math.floor(r);
+      c.style.transform = 'translateY(' + ((r - .5) * 1.8).toFixed(2) + 'px)';
+      c.style.opacity = (.74 + r * .26).toFixed(2);
+      paper.appendChild(c);
+    }
+  }
+  var caret = document.createElement('span'); caret.className = 'caret'; paper.appendChild(caret);
+}
+function resetPaper() { typedText = ''; renderPaper(); }
+
+var down = {};
+addEventListener('keydown', function (e) {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  var printable = e.key.length === 1;
+  if (!printable && e.key !== 'Backspace' && e.key !== 'Enter') return;
+  var act = document.activeElement;
+  if ((e.key === ' ' || e.key === 'Enter') && act && /^(BUTTON|A|SUMMARY)$/.test(act.tagName)) return;
+  if (e.key === ' ' || e.key === 'Backspace') e.preventDefault();
+  if (!down[e.code]) thock(false, e.key === ' ');
+  down[e.code] = true;
+  if (e.key === 'Backspace') typedText = typedText.slice(0, -1);
+  else if (e.key === 'Enter') typedText = '';
+  else typedText = (typedText + e.key).slice(-90);
+  renderPaper();
+});
+addEventListener('keyup', function (e) {
+  if (down[e.code]) { down[e.code] = false; thock(true, e.key === ' '); }
+});
+addEventListener('blur', function () { down = {}; });
+paper.addEventListener('click', function () { paper.focus(); thock(false, false); });
+
+document.querySelectorAll('.tabs button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    pack = b.dataset.pack;
+    document.querySelectorAll('.tabs button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+    thock(false, false); setTimeout(function () { thock(true, false); }, 90);
+  });
+});
+document.querySelectorAll('.lang button').forEach(function (b) {
+  b.addEventListener('click', function () { setLang(b.dataset.lang, true); });
+});
+
 (function () {
   var saved = null; try { saved = localStorage.getItem('keytone-lang'); } catch (e) {}
   var q = new URLSearchParams(location.search).get('lang');
   var lang = q || saved || ((navigator.language || 'en').toLowerCase().indexOf('ru') === 0 ? 'ru' : 'en');
-  setLang(lang === 'ru' ? 'ru' : 'en');
-  document.querySelector('.js-lang').addEventListener('click', function () {
-    setLang(document.documentElement.lang === 'ru' ? 'en' : 'ru');
-  });
-})();
-/* ---- links: derive repo from the GitHub Pages address (user.github.io/repo) ---- */
-(function () {
-  var host = location.hostname, path = location.pathname.split('/').filter(Boolean);
-  var owner = host.endsWith('.github.io') ? host.replace('.github.io', '') : null;
-  var repo = owner ? (path[0] || owner + '.github.io') : null;
-  var base = owner ? 'https://github.com/' + owner + '/' + repo : 'https://github.com';
-  document.querySelectorAll('.js-repo').forEach(function (a) { a.href = base; });
-  document.querySelectorAll('.js-download').forEach(function (a) {
-    a.href = owner ? base + '/releases/latest/download/Keytone.zip' : base;
-  });
-})();
-
-/* ---- live keyboard with a tiny WebAudio "thock" ---- */
-(function () {
-  var rows = [['Q','W','E','R','T','Y','U','I','O','P'], ['A','S','D','F','G','H','J','K','L'], ['Z','X','C','V','B','N','M'], [' ']];
-  var board = document.querySelector('.js-board'), keys = {};
-  rows.forEach(function (r) {
-    var row = document.createElement('div'); row.className = 'krow';
-    r.forEach(function (k) {
-      var el = document.createElement('div'); el.className = 'key' + (k === ' ' ? ' space' : ''); el.textContent = k === ' ' ? '' : k;
-      el.addEventListener('pointerdown', function () { press(k); });
-      el.addEventListener('pointerup', function () { release(k); });
-      el.addEventListener('pointerleave', function () { release(k); });
-      keys[k] = el; row.appendChild(el);
-    });
-    board.appendChild(row);
-  });
-
-  var profiles = {
-    cream:   { f: [175, 330, 980], q: [7, 5, 4], g: [1, .55, .14], cut: 2600, ex: .0032 },
-    tactile: { f: [290, 720, 2100], q: [6, 7, 7], g: [.7, .45, .22], cut: 5200, ex: .0016 },
-    clicky:  { f: [420, 2300, 4200], q: [5, 10, 3], g: [.45, .35, .5], cut: 7500, ex: .0012 }
-  };
-  var current = 'cream', ctx = null;
-
-  function thock(isUp, space) {
-    try {
-      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
-      if (ctx.state === 'suspended') ctx.resume();
-      var p = profiles[current], t = ctx.currentTime, sr = ctx.sampleRate;
-      var len = Math.floor(sr * p.ex * (isUp ? .8 : 1)), buf = ctx.createBuffer(1, len, sr), d = buf.getChannelData(0);
-      for (var i = 0; i < len; i++) d[i] = (Math.random() * 1.2 - .2) * (0.5 - 0.5 * Math.cos(2 * Math.PI * i / (len - 1)));
-      var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = p.cut;
-      var out = ctx.createGain(); out.gain.value = (isUp ? .18 : .5) * (space ? 1.1 : 1);
-      lp.connect(out); out.connect(ctx.destination);
-      var pitch = (isUp ? 1.12 : 1) * (space ? .7 : 1) * (1 + (Math.random() - .5) * .06);
-      p.f.forEach(function (f, i) {
-        var src = ctx.createBufferSource(); src.buffer = buf;
-        var bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f * pitch; bp.Q.value = p.q[i];
-        var g = ctx.createGain(); g.gain.value = p.g[i] * 6;
-        src.connect(bp); bp.connect(g); g.connect(lp); src.start(t);
-      });
-    } catch (e) {}
-  }
-  function press(k) { var el = keys[k]; if (!el || el.classList.contains('down')) return; el.classList.add('down'); thock(false, k === ' '); }
-  function release(k) { var el = keys[k]; if (!el || !el.classList.contains('down')) return; el.classList.remove('down'); thock(true, k === ' '); }
-
-  addEventListener('keydown', function (e) {
-    if (e.metaKey || e.ctrlKey || e.repeat) return;
-    var k = e.code === 'Space' ? ' ' : (e.code.startsWith('Key') ? e.code.slice(3) : null);
-    if (k && keys[k]) { if (k === ' ') e.preventDefault(); press(k); }
-  });
-  function releaseAll() { Object.keys(keys).forEach(function (k) { keys[k].classList.remove('down'); }); }
-  addEventListener('blur', releaseAll);
-  document.addEventListener('visibilitychange', function () { if (document.hidden) releaseAll(); });
-  addEventListener('keyup', function (e) {
-    var k = e.code === 'Space' ? ' ' : (e.code.startsWith('Key') ? e.code.slice(3) : null);
-    if (k) release(k);
-  });
-
-  document.querySelectorAll('.js-profiles .opt').forEach(function (o) {
-    o.addEventListener('click', function () {
-      document.querySelectorAll('.js-profiles .opt').forEach(function (x) { x.classList.remove('on'); });
-      o.classList.add('on'); current = o.dataset.p;
-      document.querySelector('.js-current').textContent = o.firstChild.nextSibling.firstChild.textContent;
-      thock(false, false);
-    });
-  });
-})();
-
-/* ---- reveal on scroll ---- */
-(function () {
-  var els = document.querySelectorAll('.reveal');
-  if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
-  var io = new IntersectionObserver(function (es) {
-    es.forEach(function (e, i) { if (e.isIntersecting) { setTimeout(function () { e.target.classList.add('in'); }, i * 70); io.unobserve(e.target); } });
-  }, { threshold: .12 });
-  els.forEach(function (e) { io.observe(e); });
+  setLang(lang === 'en' ? 'en' : 'ru', true);
 })();
 </script>
 </body>

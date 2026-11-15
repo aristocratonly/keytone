@@ -28,12 +28,12 @@ final class AppState {
         didSet {
             guard !syncingLogin else { return }
             do { launchAtLogin ? try SMAppService.mainApp.register() : try SMAppService.mainApp.unregister() }
-            catch { importMessage = "Автозапуск: \(error.localizedDescription)" }
+            catch { importMessage = L("Автозапуск: ", "Open at login: ") + error.localizedDescription }
             // reflect the real state (a failed or pending registration must not leave the box ticked)
             let actual = SMAppService.mainApp.status == .enabled
             if actual != launchAtLogin { syncingLogin = true; launchAtLogin = actual; syncingLogin = false }
             if SMAppService.mainApp.status == .requiresApproval {
-                importMessage = "Подтвердите автозапуск в Настройках → Основные → Объекты входа"
+                importMessage = L("Подтвердите автозапуск в Настройках → Основные → Объекты входа", "Confirm in System Settings → General → Login Items")
                 SMAppService.openSystemSettingsLoginItems()
             }
         }
@@ -141,12 +141,12 @@ final class AppState {
         panel.canChooseDirectories = true
         panel.canChooseFiles = true
         panel.allowedContentTypes = [.zip, .folder]
-        panel.message = "Выберите папку или .zip с паком Mechvibes"
+        panel.message = L("Выберите папку или .zip с паком Mechvibes", "Choose a Mechvibes pack folder or .zip")
         NSApp.activate(ignoringOtherApps: true)
         guard panel.runModal() == .OK, let url = panel.url else { return }
         if let err = Library.importPack(from: url) { importMessage = err; return }
         customPacks = Library.loadCustom()
-        importMessage = "Пак импортирован"
+        importMessage = L("Пак импортирован", "Pack added")
         if let last = customPacks.first(where: { $0.folder?.lastPathComponent == url.deletingPathExtension().lastPathComponent }) ?? customPacks.last {
             keyProfile = last.id
         }

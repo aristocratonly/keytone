@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "docs/index.html"
+        ],
+        "createdAt": "2026-11-15T09:04:56.070Z",
+        "reason": "Claude: the ruled lines are the index-card world chosen by the user (Каталожные карточки), not decoration"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "docs/index.html"
+        ],
+        "createdAt": "2026-11-15T09:05:02.814Z",
+        "reason": "Claude verified computed padding: hero card text inset 22-64px (only the index-card red rule runs edge to edge by design), FAQ card inset 18px+"
+      }
+    ]
+  }
+}

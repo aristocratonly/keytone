@@ -227,16 +227,16 @@ enum Library {
             let p = Process()
             p.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
             p.arguments = ["-x", "-k", url.path, tmp.path]
-            do { try p.run(); p.waitUntilExit() } catch { return "Не удалось распаковать архив" }
+            do { try p.run(); p.waitUntilExit() } catch { return L("Не удалось распаковать архив", "Couldn’t unpack the archive") }
             root = tmp
         }
-        guard let cfg = findConfig(in: root) else { return "В папке не найден config.json" }
+        guard let cfg = findConfig(in: root) else { return L("В папке не найден config.json", "No config.json found in the folder") }
         let src = cfg.deletingLastPathComponent()
         let unzippedFlat = root != url && src.standardizedFileURL == root.standardizedFileURL
         let dst = packsDir.appendingPathComponent(unzippedFlat ? url.deletingPathExtension().lastPathComponent : src.lastPathComponent)
         try? fm.removeItem(at: dst)
-        do { try fm.copyItem(at: src, to: dst) } catch { return "Не удалось скопировать пак" }
-        return MechvibesPack(folder: dst) == nil ? "Пак не распознан (неподдерживаемый формат звука?)" : nil
+        do { try fm.copyItem(at: src, to: dst) } catch { return L("Не удалось скопировать пак", "Couldn’t copy the pack") }
+        return MechvibesPack(folder: dst) == nil ? L("Пак не распознан (неподдерживаемый формат звука?)", "Pack not recognised (unsupported audio format?)") : nil
     }
 
     private static func findConfig(in dir: URL) -> URL? {
